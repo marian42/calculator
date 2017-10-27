@@ -1,0 +1,4 @@
+node_modules/*
+script.js
+ts/generated/*
+build/*

@@ -1,0 +1,20 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "antlr": "antlr4ts -visitor Calculator.g4 -o ts/generated/",
+    "ts": "tsc"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "antlr4ts": "latest",
+    "antlr4ts-cli": "latest",
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-ts": "^6.0.0-beta.16",
+    "typescript": "latest"
+  }
+}
