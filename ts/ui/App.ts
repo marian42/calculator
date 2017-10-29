@@ -11,7 +11,7 @@ export class App {
 		this.taskContainer = document.getElementsByClassName("tasks").item(0) as HTMLElement;
 		this.tasks = [];
 		this.context = new CalculatorContext();
-		this.addTask();
+		this.addTask().focus();
 	}
 
 	private addTask(): TaskElement {
