@@ -38,6 +38,9 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		if (this.context.variables[variableName] != undefined) {
 			return this.context.variables[variableName];
 		}
+		if (this.context.constants[variableName] != undefined) {
+			return this.context.constants[variableName];
+		}
 		throw new Error("Unknown identifier: " + variableName);
 	}
 
