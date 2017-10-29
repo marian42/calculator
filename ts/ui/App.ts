@@ -26,8 +26,12 @@ export class App {
 	private onKeyPress(event: KeyboardEvent, taskElement: TaskElement) {
 		let index = this.tasks.indexOf(taskElement);
 		if (event.keyCode == 13 && index == this.tasks.length - 1) {
-			if (this.tasks[this.tasks.length - 1].task.result != null) {
-				this.context.variables["ans"] = this.tasks[this.tasks.length - 1].task.result!;
+			let oldTaskElement = this.tasks[this.tasks.length - 1];
+			if (oldTaskElement.task.result != null) {
+				this.context.variables["ans"] = oldTaskElement.task.result!;
+			}
+			if (oldTaskElement.task.error != null) {
+				console.log(oldTaskElement.task.error);
 			}
 			let newTask = this.addTask();
 			newTask.queryElement.focus();

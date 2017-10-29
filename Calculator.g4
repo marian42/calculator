@@ -14,7 +14,7 @@ expression :
 	| expression op=('+'|'-') expression		# exprAddSub
 	| number									# exprNumber
 	| '(' expression ')'						# exprParentheses
-	| ID '(' expression (',' expression)* ')'	# exprFunctioncall
+	| ID '(' (expression (',' expression)*)? ')'# exprFunctioncall
 	| ID										# exprVariable
 ;
 

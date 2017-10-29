@@ -55,7 +55,21 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
 
-	visitExprFunctioncall(ctx: ExprFunctioncallContext) { throw new Error(); }
+	visitExprFunctioncall(ctx: ExprFunctioncallContext): Result {
+		let functionName = ctx.ID().text;
+		let parameters = [];
+		console.log();
+		for (var i = 0; i < ctx.childCount; i++) {
+			if (ctx.getChild(i) instanceof ExpressionContext) {
+				parameters.push(ctx.getChild(i).accept(this));
+			}
+		}
+		if (this.context.functions[functionName] != undefined) {
+			return this.context.functions[functionName].invoke(parameters);
+		}
+
+		throw new Error("Unknown function identifier " + functionName);
+	}
 
 	visitExprPower(ctx: ExprPowerContext) : Result {
 		let base = ctx.expression(0).accept(this);
