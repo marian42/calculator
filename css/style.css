@@ -1,5 +1,5 @@
 body {
-	background-color: #141414;
+	background-color: #0f0f0f;
 	margin: 0;
 	width: 100%;
 	height: 100%;
@@ -38,7 +38,7 @@ input, textarea{
 }
 
 .task:last-of-type {
-	background-color: #323030;
+	background-color: #1f1f1f;
 	position: fixed;
 	bottom: 0;
 	margin: 0 auto;
@@ -47,7 +47,7 @@ input, textarea{
 }
 
 .task:focus-within {
-	background-color: #595959;
+	background-color: #333333;
 }
 
 input:focus, textarea:focus {
