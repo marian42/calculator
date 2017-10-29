@@ -117,7 +117,14 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitNumber(ctx: NumberContext) : number {
-		return Number.parseFloat(ctx.NUM()!.text);
+		let text = ctx.NUM()!.text;
+		if (text.startsWith("0b")) {
+			return Number.parseInt(text.substr(2), 2);
+		} else if (text.startsWith("0x")) {
+			return Number.parseInt(text.substr(2), 16);
+		} else {			
+			return Number.parseFloat(text);
+		}
 	}
 
 	visit(tree: ParseTree): any {
