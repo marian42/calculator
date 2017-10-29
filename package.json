@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "antlr": "antlr4ts -visitor Calculator.g4 -o ts/generated/",
-    "ts": "tsc"
+    "ts": "tsc --moduleResolution node && webpack"
   },
   "author": "",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-ts": "^6.0.0-beta.16",
-    "typescript": "latest"
+    "typescript": "latest",
+    "webpack": "^3.8.1"
   }
 }
