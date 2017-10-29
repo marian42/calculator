@@ -21,7 +21,7 @@ export class TaskElement {
 		container.appendChild(this.htmlElement);
 		this.queryElement = (this.htmlElement.getElementsByClassName("query").item(0) as HTMLInputElement);
 		this.resultElement = (this.htmlElement.getElementsByClassName("result").item(0) as HTMLInputElement);
-		
+
 		this.showResult();
 
 		var el = this;
@@ -43,5 +43,10 @@ export class TaskElement {
 		}
 		this.task.update(newQuery);
 		this.showResult();
+	}
+
+	public focus() {
+		this.queryElement.focus();
+		setTimeout(() => { this.queryElement.setSelectionRange(this.queryElement.value.length, this.queryElement.value.length); }, 0);
 	}
 }

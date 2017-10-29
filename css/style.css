@@ -33,6 +33,10 @@ input, textarea{
 	position: relative;
 }
 
+.task:first-of-type {
+	margin-top: 20px;
+}
+
 .task:last-of-type {
 	background-color: #323030;
 	position: fixed;
