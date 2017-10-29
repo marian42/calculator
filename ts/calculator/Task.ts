@@ -4,7 +4,7 @@ import { ANTLRInputStream, CommonTokenStream } from 'antlr4ts';
 import { CalculatorLexer } from "../generated/CalculatorLexer";
 import { CalculatorParser } from "../generated/CalculatorParser";
 import { CalculatorVisitorImpl } from "../calculator/CalculatorVisitorImpl";
-import { ExpressionStatement } from "../calculator/ExpressionStatement";
+import { CalculatorContext } from "./CalculatorContext";
 
 export class Task {
 	public query: string;
@@ -13,10 +13,13 @@ export class Task {
 
 	public parser: CalculatorParser | null;
 
-	constructor() {
+	public readonly context: CalculatorContext;
+
+	constructor(context: CalculatorContext) {
 		this.query = "";
 		this.result = null;
 		this.error = null;
+		this.context = context;
 	}
 
 	update(query: string): void {
@@ -29,7 +32,7 @@ export class Task {
 			let tokenStream = new CommonTokenStream(lexer);
 			this.parser = new CalculatorParser(tokenStream);
 
-			let visitor = new CalculatorVisitorImpl();
+			let visitor = new CalculatorVisitorImpl(this.context);
 			this.result = this.parser.statement().accept(visitor);
 		} catch (e) {
 			this.error = e;

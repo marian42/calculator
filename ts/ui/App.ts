@@ -1,18 +1,21 @@
 import { TaskElement } from "./TaskElement";
 import { Task } from "../calculator/Task";
+import { CalculatorContext } from "../calculator/CalculatorContext";
 
 export class App {
 	public taskContainer: HTMLElement;
 	public tasks: TaskElement[];
+	public context: CalculatorContext;
 
 	constructor() {
 		this.taskContainer = document.getElementsByClassName("tasks").item(0) as HTMLElement;
 		this.tasks = [];
+		this.context = new CalculatorContext();
 		this.addTask();
 	}
 
 	private addTask(): TaskElement {
-		var task = new Task();
+		var task = new Task(this.context);
 		var element = new TaskElement(task, this.taskContainer);
 		this.tasks.push(element);
 		let app = this;

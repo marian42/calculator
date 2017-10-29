@@ -1,6 +1,5 @@
 import { CalculatorVisitor } from "../generated/CalculatorVisitor";
 import { Result } from "./Result";
-import { AssignStatement} from "./AssignStatement";
 
 import { ExprInvertContext } from '../generated/CalculatorParser';
 import { ExprVariableContext } from '../generated/CalculatorParser';
@@ -21,15 +20,26 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree';
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
 import { RuleNode } from 'antlr4ts/tree/RuleNode';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
-import { Statement } from './Statement';
+import { CalculatorContext } from "./CalculatorContext";
 
 export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
+	private readonly context : CalculatorContext;
+
+	constructor(context: CalculatorContext) {
+		this.context = context;
+	}
 
 	visitExprInvert(ctx: ExprInvertContext) : Result {
 		return new Result(-(this.visit(ctx.expression()) as Result).value);
 	}
 
-	visitExprVariable(ctx: ExprVariableContext) { throw new Error(); }
+	visitExprVariable(ctx: ExprVariableContext) {
+		let variableName = ctx.ID().text;
+		if (this.context.variables[variableName] != undefined) {
+			return this.context.variables[variableName];
+		}
+		throw new Error("Unknown identifier: " + variableName);
+	}
 
 	visitExprAddSub(ctx: ExprAddSubContext) : Result {
 		let left = ctx.expression(0).accept(this);
@@ -70,16 +80,19 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		return ctx.expression().accept(this);
 	}
 
-	visitStatementExpression(ctx: StatementExpressionContext) {
+	visitStatementExpression(ctx: StatementExpressionContext): Result {
 		return ctx.expression().accept(this);
 	}
 
-	visitStatement(ctx: StatementContext) : Statement {
+	visitStatement(ctx: StatementContext) : Result {
 		return ctx.accept(this);
 	}
 
-	visitAssignment(ctx: AssignmentContext) {
-		return new AssignStatement(ctx.ID().text, ctx.expression().accept(this));
+	visitAssignment(ctx: AssignmentContext): Result {
+		let variableName = ctx.ID().text;
+		let result = ctx.expression().accept(this);
+		this.context.variables[variableName] = result;
+		return result;
 	}
 
 	visitExpression(ctx: ExpressionContext): Result {
