@@ -26,6 +26,9 @@ export class App {
 	private onKeyPress(event: KeyboardEvent, taskElement: TaskElement) {
 		let index = this.tasks.indexOf(taskElement);
 		if (event.keyCode == 13 && index == this.tasks.length - 1) {
+			if (this.tasks[this.tasks.length - 1].task.result != null) {
+				this.context.variables["ans"] = this.tasks[this.tasks.length - 1].task.result!;
+			}
 			let newTask = this.addTask();
 			newTask.queryElement.focus();
 			this.taskContainer.scrollTo(0, this.taskContainer.scrollHeight);
