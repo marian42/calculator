@@ -1,6 +1,8 @@
 import { BaseUnit } from "./BaseUnit";
 
 export class BaseUnitBlock {
+	public static readonly one = new BaseUnitBlock();
+
 	private exponents: {[index: string] : number};
 
 	constructor(exponents?: [BaseUnit, number][]) {
@@ -10,6 +12,68 @@ export class BaseUnitBlock {
 				this.exponents[item[0]] = item[1];
 			}
 		}
+	}
+
+	public createCopy(): BaseUnitBlock {
+		var paramExponents: [BaseUnit, number][] = [];
+		for (var baseUnit in this.exponents) {
+			paramExponents.push([(<any>BaseUnit)[baseUnit], this.exponents[baseUnit]]);
+		}
+		return new BaseUnitBlock(paramExponents);
+	}
+
+	public getDistance(block: BaseUnitBlock): number {
+		var result = 0;
+		for (var key in this.exponents) {
+			result += this.exponents[key] - block.getExponent((<any>BaseUnit)[key]);
+		}
+		for (var baseUnit of block.getActiveBaseUnits()) {
+			if (this.exponents[baseUnit] == undefined) {
+				result -= block.getExponent(baseUnit);
+			}
+		}
+		return result;
+	}
+
+	public createMultiple(exponent: number): BaseUnitBlock {
+		var result = new BaseUnitBlock();
+		for (var key in this.exponents) {
+			result.addExponent((<any>BaseUnit)[key], this.exponents[key] * exponent);
+		}
+		return result;
+	}
+
+	public createSum(block: BaseUnitBlock): BaseUnitBlock {
+		var result = block.createCopy();
+		for (var key in this.exponents) {
+			result.addExponent((<any>BaseUnit)[key], this.exponents[key]);
+		}
+		return result;
+	}
+
+	// Returns the factor which lets the parameter block best approach the current block
+	// If this block is m^-5*s and the parameter is m, the result will be -5, as m^-5 is the closest approximation.
+	public getBestFactor(block: BaseUnitBlock): number {
+		var candidates: number[] = [];
+		for (var key in this.exponents) {
+			if (this.exponents[key] == 0 || block.getExponent((<any>BaseUnit)[key]) == 0) {
+				continue;
+			}
+			var factor = this.exponents[key] / block.getExponent((<any>BaseUnit)[key]);
+			if (factor != 0 && candidates.indexOf(factor) == -1) {
+				candidates.push(factor);
+			}
+		}
+		var bestFactor = 0;
+		var bestDistance = this.getDistance(BaseUnitBlock.one);
+		for (var candidate of candidates) {
+			var distance = this.getDistance(block.createMultiple(candidate));
+			if (distance < bestDistance) {
+				bestDistance = distance;
+				bestFactor = candidate;
+			}
+		}
+		return bestFactor;
 	}
 
 	public addExponent(baseUnit: BaseUnit, amount: number) {
@@ -36,5 +100,9 @@ export class BaseUnitBlock {
 			result.push((<any>BaseUnit)[key]);
 		}
 		return result;
+	}
+
+	public isOne(): boolean {
+		return Object.keys(this.exponents).length == 0;
 	}
 }

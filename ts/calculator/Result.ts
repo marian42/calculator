@@ -1,10 +1,17 @@
 import { TinyNumber } from "../language/TinyNumber";
+import { Unit } from "./units/Unit";
 
 export class Result {
 	public readonly value: number;
+	public readonly unit: Unit;
 
-	public constructor(value: number) {
+	public constructor(value: number, unit?: Unit) {
 		this.value = value;
+		if (unit == undefined) {
+			this.unit = new Unit();
+		} else {
+			this.unit = unit;
+		}
 	}
 
 	public toString(): string {
@@ -17,7 +24,8 @@ export class Result {
 		} else if (Math.abs(this.value) < Number.EPSILON) {
 			return "0";
 		}
-		return Result.formatNumber(this.value);
+		let unitAndRemainder = this.unit.toString();
+		return Result.formatNumber(this.value * unitAndRemainder[1]) + unitAndRemainder[0];
 	}
 
 	private static numberToString(value: number, maxDecimalPoints = 8): string {
