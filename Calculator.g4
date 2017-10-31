@@ -4,14 +4,14 @@ grammar Calculator;
 // Parser rules
 statement :
 	expression									# statementExpression
-	| ID ('=' | ':') expression					# assignment
+	| ID ASSIGN expression						# assignment
 ;
 
 expression :
-	  expression '^' expression					# exprPower
-	| expression op=('*'|'/') expression		# exprMulDiv
-	| '-' expression							# exprInvert
-	| expression op=('+'|'-') expression		# exprAddSub
+	  expression POW expression					# exprPower
+	| expression op=(MUL | DIV) expression		# exprMulDiv
+	| SUB expression							# exprInvert
+	| expression op=(ADD | SUB) expression		# exprAddSub
 	| number									# exprNumber
 	| '(' expression ')'						# exprParentheses
 	| ID '(' (expression (',' expression)*)? ')'# exprFunctioncall
@@ -22,20 +22,19 @@ number : NUM;
 
 // Lexer rules
 
-ID : [_a-zA-Z][_a-zA-Z0-9]*;
 fragment INT : [0-9]+ | '0b' ('0'|'1')+ | '0x' [0-9a-fA-F]+;
 fragment FLOAT : [0-9]+ ('.' [0-9]+)? ('e' ('+' | '-')? [0-9]+)?;
 NUM : INT | FLOAT;
 
-MUL : '*';
-DIV : '/';
-ADD : '+';
-SUB : '-';
-POW : '^';
+MUL : '*' | '✕' | '✖' | '⨉' | '⨯' | '·' | '∙' | '⋅' | 'times';
+DIV : '/' | '÷' | 'divided by';
+ADD : '+' | 'plus';
+SUB : '-' | 'minus';
+POW : '^' | '**';
 COMMA : ',';
-ASSIGN : '=';
-COLON : ':';
+ASSIGN : '=' | ':' | ':=';
 PLEFT : '(';
 PRIGHT : ')';
 
-WS : (' ' | '\t') -> channel(HIDDEN);
+ID : [_a-zA-Z][_a-zA-Z0-9]*;
+WS : (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN);

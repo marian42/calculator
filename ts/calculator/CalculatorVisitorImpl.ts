@@ -48,9 +48,9 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		let left = ctx.expression(0).accept(this);
 		let right = ctx.expression(1).accept(this);
 
-		if (ctx._op.text == "+") {
+		if (ctx.ADD() != undefined) {
 			return new Result(left.value + right.value);
-		} else if (ctx._op.text == "-") {
+		} else if (ctx.SUB() != undefined) {
 			return new Result(left.value - right.value);
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
@@ -86,9 +86,9 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		let left = ctx.expression(0).accept(this);
 		let right = ctx.expression(1).accept(this);
 
-		if (ctx._op.text == "*") {
+		if (ctx.MUL() != undefined) {
 			return new Result(left.value * right.value);
-		} else if (ctx._op.text == "/") {
+		} else if (ctx.DIV() != undefined) {
 			return new Result(left.value / right.value);
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
@@ -122,7 +122,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 			return Number.parseInt(text.substr(2), 2);
 		} else if (text.startsWith("0x")) {
 			return Number.parseInt(text.substr(2), 16);
-		} else {			
+		} else {
 			return Number.parseFloat(text);
 		}
 	}
