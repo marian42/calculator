@@ -1,5 +1,6 @@
 import { CalculatorVisitor } from "../generated/CalculatorVisitor";
 import { Result } from "./Result";
+import { TinyNumber } from "../language/TinyNumber";
 
 import { ExprInvertContext } from '../generated/CalculatorParser';
 import { ExprVariableContext } from '../generated/CalculatorParser';
@@ -14,6 +15,7 @@ import { StatementContext } from '../generated/CalculatorParser';
 import { AssignmentContext } from '../generated/CalculatorParser';
 import { ExpressionContext } from '../generated/CalculatorParser';
 import { NumberContext } from '../generated/CalculatorParser';
+import { ExprTinyPowerContext } from '../generated/CalculatorParser';
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
@@ -125,6 +127,11 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		} else {
 			return Number.parseFloat(text);
 		}
+	}
+
+	visitExprTinyPower(ctx: ExprTinyPowerContext): Result {
+		var exponent = TinyNumber.parse(ctx.TINYNUMBER().text);
+		return new Result(Math.pow(ctx.expression().accept(this).value, exponent));
 	}
 
 	visit(tree: ParseTree): any {
