@@ -127,5 +127,3 @@ export class NamedUnit extends Unit {
 		NamedUnit.basicUnits.push(NamedUnit.get("g"));
 	}
 }
-
-NamedUnit.initializeBasicUnits();

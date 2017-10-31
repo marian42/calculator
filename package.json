@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "antlr": "antlr4ts -visitor Calculator.g4 -o ts/generated/",
-    "ts": "tsc --moduleResolution node && webpack"
+    "ts": "tsc --moduleResolution node && node postprocess.js && webpack"
   },
   "author": "",
   "license": "MIT",
