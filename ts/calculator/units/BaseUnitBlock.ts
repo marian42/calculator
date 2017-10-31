@@ -17,7 +17,7 @@ export class BaseUnitBlock {
 	public createCopy(): BaseUnitBlock {
 		var paramExponents: [BaseUnit, number][] = [];
 		for (var baseUnit in this.exponents) {
-			paramExponents.push([(<any>BaseUnit)[baseUnit], this.exponents[baseUnit]]);
+			paramExponents.push([baseUnit as BaseUnit, this.exponents[baseUnit]]);
 		}
 		return new BaseUnitBlock(paramExponents);
 	}
@@ -25,7 +25,7 @@ export class BaseUnitBlock {
 	public getDistance(block: BaseUnitBlock): number {
 		var result = 0;
 		for (var key in this.exponents) {
-			result += this.exponents[key] - block.getExponent((<any>BaseUnit)[key]);
+			result += this.exponents[key] - block.getExponent(key as BaseUnit);
 		}
 		for (var baseUnit of block.getActiveBaseUnits()) {
 			if (this.exponents[baseUnit] == undefined) {
@@ -38,7 +38,7 @@ export class BaseUnitBlock {
 	public createMultiple(exponent: number): BaseUnitBlock {
 		var result = new BaseUnitBlock();
 		for (var key in this.exponents) {
-			result.addExponent((<any>BaseUnit)[key], this.exponents[key] * exponent);
+			result.addExponent(key as BaseUnit, this.exponents[key] * exponent);
 		}
 		return result;
 	}
@@ -46,7 +46,7 @@ export class BaseUnitBlock {
 	public createSum(block: BaseUnitBlock): BaseUnitBlock {
 		var result = block.createCopy();
 		for (var key in this.exponents) {
-			result.addExponent((<any>BaseUnit)[key], this.exponents[key]);
+			result.addExponent(key as BaseUnit, this.exponents[key]);
 		}
 		return result;
 	}
@@ -56,10 +56,10 @@ export class BaseUnitBlock {
 	public getBestFactor(block: BaseUnitBlock): number {
 		var candidates: number[] = [];
 		for (var key in this.exponents) {
-			if (this.exponents[key] == 0 || block.getExponent((<any>BaseUnit)[key]) == 0) {
+			if (this.exponents[key] == 0 || block.getExponent(key as BaseUnit) == 0) {
 				continue;
 			}
-			var factor = this.exponents[key] / block.getExponent((<any>BaseUnit)[key]);
+			var factor = this.exponents[key] / block.getExponent(key as BaseUnit);
 			if (factor != 0 && candidates.indexOf(factor) == -1) {
 				candidates.push(factor);
 			}
@@ -97,7 +97,7 @@ export class BaseUnitBlock {
 	public getActiveBaseUnits(): BaseUnit[] {
 		var result = [];
 		for (var key in this.exponents) {
-			result.push((<any>BaseUnit)[key]);
+			result.push(key as BaseUnit);
 		}
 		return result;
 	}
