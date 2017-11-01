@@ -16,37 +16,38 @@ input, textarea{
 	background: none;
 }
 
-.tasks {
+.cards {
 	width: 100%;
 	position: absolute;
 	left: 0;
 	bottom: 0;
-	max-height: calc(100% - 95px);
-	padding-bottom: 95px;
+	max-height: calc(100% - 115px);
+	padding-bottom: 115px;
 	overflow-y: overlay;
 	flex-direction: column-reverse;
 }
 
-.task {
+.card {
 	width: 1000px;
 	margin: 0px auto;
 	position: relative;
 }
 
-.task:first-of-type {
+.card:first-of-type {
 	margin-top: 20px;
 }
 
-.task:last-of-type {
+.card:last-of-type {
 	background-color: #1f1f1f;
 	position: fixed;
 	bottom: 0;
 	margin: 0 auto;
+	margin-bottom: 15px;
 	left: 0;
 	right: 0;
 }
 
-.task:focus-within {
+.card:focus-within {
 	background-color: #333333;
 }
 
@@ -69,4 +70,22 @@ input:focus, textarea:focus {
 	right: 0;
 	top: 0;
 	cursor: text;
+}
+
+.contentcard {
+	padding: 25px;
+	font-family: sans-serif;
+	font-size: 17px;
+	background-color: rgb(27, 31, 32);
+	margin-bottom: 10px;
+	letter-spacing: 0px;
+}
+
+a {
+	color: white;
+}
+
+h1 a {
+	color:inherit;
+	text-decoration: none;
 }

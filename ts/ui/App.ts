@@ -8,7 +8,7 @@ export class App {
 	public context: CalculatorContext;
 
 	constructor() {
-		this.taskContainer = document.getElementsByClassName("tasks").item(0) as HTMLElement;
+		this.taskContainer = document.getElementsByClassName("cards").item(0) as HTMLElement;
 		this.tasks = [];
 		this.context = new CalculatorContext();
 		this.addTask().focus();

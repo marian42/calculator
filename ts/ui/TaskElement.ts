@@ -13,7 +13,7 @@ export class TaskElement {
 		this.task = task;
 
 		if (TaskElement.elementPrototype == null) {
-			TaskElement.elementPrototype = document.getElementsByClassName("task").item(0) as HTMLElement;
+			TaskElement.elementPrototype = document.getElementById("taskPrototype") as HTMLElement;
 			TaskElement.elementPrototype.parentElement!.removeChild(TaskElement.elementPrototype);
 		}
 
