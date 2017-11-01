@@ -7,7 +7,7 @@ export class TaskElement {
 
 	public readonly htmlElement: HTMLElement;
 	public readonly queryElement: HTMLInputElement;
-	public readonly resultElement: HTMLInputElement;
+	public readonly resultElement: HTMLSpanElement;
 
 	public constructor(task: Task, container: HTMLElement) {
 		this.task = task;
@@ -20,7 +20,7 @@ export class TaskElement {
 		this.htmlElement = TaskElement.elementPrototype.cloneNode(true) as HTMLElement;
 		container.appendChild(this.htmlElement);
 		this.queryElement = (this.htmlElement.getElementsByClassName("query").item(0) as HTMLInputElement);
-		this.resultElement = (this.htmlElement.getElementsByClassName("result").item(0) as HTMLInputElement);
+		this.resultElement = (this.htmlElement.getElementsByClassName("result").item(0) as HTMLSpanElement);
 
 		this.showResult();
 
@@ -30,9 +30,11 @@ export class TaskElement {
 
 	private showResult() {
 		if (this.task.result == null) {
-			this.resultElement.value = "";
+			this.resultElement.innerText = "";
+			this.queryElement.style.width = "calc(100% - 50px)";
 		} else {
-			this.resultElement.value = this.task.result!.toString();
+			this.resultElement.innerText = this.task.result!.toString();
+			this.queryElement.style.width = "calc(100% - 50px - " + this.resultElement.clientWidth + "px)";
 		}
 	}
 

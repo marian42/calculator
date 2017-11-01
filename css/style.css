@@ -57,16 +57,13 @@ input:focus, textarea:focus {
 .task .query {
 	border: none;
 	padding: 25px;
-	padding-right: 0;
-	width: calc(100% - 300px - 25px);
+	width: calc(100% - 50px);
 }
 
 .task .result {
-	text-align: right;
 	border: none;
 	padding: 25px;
 	padding-right: 35px;
-	width: calc(300px - 65px);
 	color: rgb(55, 255, 117);
 	position: absolute;
 	right: 0;
