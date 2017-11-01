@@ -46,10 +46,11 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprInvert(ctx: ExprInvertContext) : Result {
-		return new Result(-(this.visit(ctx.expression()) as Result).value);
+		var result: Result = this.visit(ctx.expression());
+		return new Result(-result.value, result.unit);
 	}
 
-	visitExprVariable(ctx: ExprVariableContext) {
+	visitExprVariable(ctx: ExprVariableContext): Result {
 		let variableName = ctx.ID().text;
 		if (this.context.variables[variableName] != undefined) {
 			return this.context.variables[variableName];
@@ -61,19 +62,19 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprAddSub(ctx: ExprAddSubContext) : Result {
-		let left = ctx.expression(0).accept(this);
-		let right = ctx.expression(1).accept(this);
+		let left: Result = ctx.expression(0).accept(this);
+		let right: Result = ctx.expression(1).accept(this);
 
 		if (ctx.ADD() != undefined) {
-			return new Result(left.value + right.value);
+			return new Result(left.value + right.value * right.unit.factor / left.unit.factor, left.unit);
 		} else if (ctx.SUB() != undefined) {
-			return new Result(left.value - right.value);
+			return new Result(left.value - right.value * right.unit.factor / left.unit.factor, left.unit);
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
 
 	visitExprFunctioncall(ctx: ExprFunctioncallContext): Result {
 		let functionName = ctx.ID().text;
-		let parameters = [];
+		let parameters: Result[] = [];
 		for (var i = 0; i < ctx.childCount; i++) {
 			if (ctx.getChild(i) instanceof ExpressionContext) {
 				parameters.push(ctx.getChild(i).accept(this));
@@ -90,7 +91,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		let base = ctx.expression(0).accept(this);
 		let exponent = ctx.expression(1).accept(this);
 
-		return new Result(Math.pow(base.value, exponent.value));
+		return new Result(Math.pow(base.value, exponent.value), base.unit.power(exponent.value));
 	}
 
 	visitExprNumber(ctx: ExprNumberContext) : Result {
@@ -103,16 +104,16 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		let right = ctx.expression(1).accept(this);
 
 		if (ctx.MUL() != undefined) {
-			return new Result(left.value * right.value);
+			return new Result(left.value * right.value, left.unit.multiplyWith(right.unit));
 		} else if (ctx.DIV() != undefined) {
-			return new Result(left.value / right.value);
+			return new Result(left.value / right.value, left.unit.divideBy(right.unit));
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
 
 	visitExprParentheses(ctx: ExprParenthesesContext) : Result {
-		var unit = ctx.unit() == undefined ? new Unit() : ctx.unit()!.accept(this);
-		var innerResult = ctx.expression().accept(this);
-		return new Result(innerResult.value, innerResult.unit.createMultiple(unit));
+		var unit: Unit = ctx.unit() == undefined ? new Unit() : ctx.unit()!.accept(this);
+		var innerResult: Result = ctx.expression().accept(this);
+		return new Result(innerResult.value, innerResult.unit.multiplyWith(unit));
 	}
 
 	visitStatementExpression(ctx: StatementExpressionContext): Result {
@@ -134,7 +135,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		return ctx.accept(this);
 	}
 
-	visitNumber(ctx: NumberContext) : number {
+	visitNumber(ctx: NumberContext): number {
 		let text = ctx.NUM()!.text;
 		if (text.startsWith("0b")) {
 			return Number.parseInt(text.substr(2), 2);
@@ -146,10 +147,10 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprTinyPower(ctx: ExprTinyPowerContext): Result {
+		var base = ctx.expression().accept(this);
 		var exponent = TinyNumber.parse(ctx.TINYNUMBER().text);
 		var unit = ctx.unit() == undefined ? new Unit() : ctx.unit()!.accept(this);
-		return new Result(Math.pow(ctx.expression().accept(this).value, exponent), unit);
-		// TODO pass unit
+		return new Result(Math.pow(base.value, exponent), base.unit.power(exponent));
 	}
 
 	visitUnitParentheses(ctx: UnitParenthesesContext): Unit {
@@ -165,29 +166,29 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		return ctx.unit().accept(this).power(ctx.number().accept(this));
 	}
 
-	visitUnitTinyPower(ctx: UnitTinyPowerContext) : Unit {
+	visitUnitTinyPower(ctx: UnitTinyPowerContext): Unit {
 		return ctx.unit().accept(this).power(TinyNumber.parse(ctx.TINYNUMBER().text));
 	}
 
-	visitUnitDivision(ctx: UnitDivisionContext) : Unit {
+	visitUnitDivision(ctx: UnitDivisionContext): Unit {
 		var left = ctx.unit(0).accept(this);
 		var right = ctx.unit(1).accept(this);
 		return left.divideBy(right);
 	}
 
-	visitUnitProduct(ctx: UnitProductContext) {
+	visitUnitProduct(ctx: UnitProductContext): Unit {
 		var left = ctx.unit(0).accept(this);
 		var right = ctx.unit(1).accept(this);
 		return left.multiplyWith(right);
 	}
 
-	visitUnitSquared(ctx: UnitSquaredContext) {
+	visitUnitSquared(ctx: UnitSquaredContext): Unit {
 		var unit = ctx.unit().accept(this);
 		return unit.power(2);
 	}
 
 	visitUnitName(ctx: UnitNameContext): Unit {
-		return new Unit(1, NamedUnit.get(ctx.NAMEDUNIT().text).exponents);
+		return NamedUnit.get(ctx.NAMEDUNIT().text);
 	}
 
 	visitUnitWithPrefix(ctx: UnitWithPrefixContext): Unit {

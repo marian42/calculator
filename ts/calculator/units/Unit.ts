@@ -4,11 +4,10 @@ import { BaseUnitBlock } from "./BaseUnitBlock";
 import { TinyNumber } from "../../language/TinyNumber";
 
 export class Unit {
-	public exponents: BaseUnitBlock;
-	public factor: number;
+	public readonly exponents: BaseUnitBlock;
+	public readonly factor: number;
 
 	public preferredNames: NamedUnit[];
-	public prefixExponents: {[index: string]: number};
 
 	constructor(factor?: number, exponents?: BaseUnitBlock) {
 		if (factor != undefined) {
@@ -22,7 +21,6 @@ export class Unit {
 			this.exponents = exponents;
 		}
 		this.preferredNames = [];
-		this.prefixExponents = {};
 	}
 
 	public multiplyWith(unit: Unit): Unit {
@@ -39,9 +37,9 @@ export class Unit {
 
 	public toString(): [string, number] {
 		if (this.exponents.getActiveBaseUnits().length == 0) {
-			return ["", 1 / this.factor];
+			return ["", this.factor];
 		} else {
-			return [this.exponents.toString(), 1 / this.factor];
+			return [this.exponents.toString(), this.factor];
 		}
 
 		/*
@@ -168,7 +166,8 @@ export class Unit {
 		if (value.indexOf(' ') != -1) {
 			var prefix = value.substr(0, value.indexOf(' ')).trim();
 			var unitName = value.substr(value.indexOf(' ') + 1).trim();
-			return new Unit(Math.pow(10, Unit.getPrefix(prefix)), NamedUnit.get(unitName).exponents);
+			var namedUnit = NamedUnit.get(unitName);
+			return new Unit(Math.pow(10, Unit.getPrefix(prefix)) * namedUnit.factor, namedUnit.exponents);
 		}
 		if (Unit.prefixNames == null) {
 			Unit.initializePrefixNames();
@@ -178,7 +177,8 @@ export class Unit {
 			if (value.startsWith(prefixName)) {
 				var unitName = value.substr(prefixName.length).trim();
 				if (NamedUnit.exists(unitName)) {
-					return new Unit(Math.pow(10, Unit.getPrefix(prefixName)), NamedUnit.get(unitName).exponents);
+					var namedUnit = NamedUnit.get(unitName);
+					return new Unit(Math.pow(10, Unit.getPrefix(prefixName)) * namedUnit.factor, namedUnit.exponents);
 				}
 			}
 		}
