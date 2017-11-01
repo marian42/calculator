@@ -26,14 +26,14 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["s", "second", "seconds"], 1, [[BaseUnit.Second, 1]]),
 		new NamedUnit(["A", "ampere", "amperes", "ampère", "ampères"], 1, [[BaseUnit.Ampere, 1]]),
 		new NamedUnit(["K", "kelvin", "kelvins"], 1, [[BaseUnit.Kelvin, 1]]),
-		new NamedUnit(["°F", "fahrenheit", "degrees fahrenheit"], 1, [[BaseUnit.Fahrenheit, 1]]),
-		new NamedUnit(["°C", "celsius", "degrees celsius"], 1, [[BaseUnit.Celsius, 1]]),
+		new NamedUnit(["°F", "° F", "fahrenheit", "degrees fahrenheit"], 1, [[BaseUnit.Fahrenheit, 1]]),
+		new NamedUnit(["°C", "° C", "celsius", "degrees celsius"], 1, [[BaseUnit.Celsius, 1]]),
 		new NamedUnit(["mol", "mole", "moles"], 1, [[BaseUnit.Mole, 1]]),
 		new NamedUnit(["cd", "candela", "candelas"], 1, [[BaseUnit.Candela, 1]]),
 		new NamedUnit(["%", "percent"], 1, [[BaseUnit.Percent, 1]]),
 		new NamedUnit(["rad", "radian", "radians"], 1, [[BaseUnit.Radian, 1]]),
 		new NamedUnit(["bit", "b", "bits"], 1, [[BaseUnit.Bit, 1]]),
-		new NamedUnit(["USD", "$", "dollar", "dollars"], 1, [[BaseUnit.Dollar, 1]]),
+		new NamedUnit(["USD", "usd", "$", "dollar", "dollars"], 1, [[BaseUnit.Dollar, 1]]),
 
 		new NamedUnit(["miles", "mile"], 1609.34, [[BaseUnit.Meter, 1]]),
 		new NamedUnit(["nautical mile", "nautical miles"], 1.852e3, [[BaseUnit.Meter, 1]]),
@@ -59,8 +59,10 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["mh"], 1 / 3600, [[BaseUnit.Meter, 1], [BaseUnit.Second, -1]], 3),
 		new NamedUnit(["knots", "knot"], 1852/3600, [[BaseUnit.Meter, 1], [BaseUnit.Second, -1]]),
 		new NamedUnit(["mpg", "miles to the gallon"], 1609.34 / 0.003785, [[BaseUnit.Meter, 1], [BaseUnit.Meter, -3]]),
-		new NamedUnit(["B", "byte"], 8, [[BaseUnit.Bit, 1]]),
+		new NamedUnit(["B", "byte",  "bytes"], 8, [[BaseUnit.Bit, 1]]),
+		new NamedUnit(["bps"], 1, [[BaseUnit.Bit, 1], [BaseUnit.Second, -1]]),
 		new NamedUnit(["W", "watt", "watts"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3]]),
+		new NamedUnit(["Wh", "watt hour", "watt hours"], 3600, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["hp", "horse power"], 745.7, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3]]),
 		new NamedUnit(["J", "joule", "joules"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["eV", "electron volts"], 1.6021766e-19, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
@@ -84,9 +86,9 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["weeks", "week"], 604800, [[BaseUnit.Second, 1]]),
 		new NamedUnit(["months", "month"], 2592000, [[BaseUnit.Second, 1]]),
 		new NamedUnit(["years", "y", "yr", "year"], 31557600, [[BaseUnit.Second, 1]]),
-		new NamedUnit(["€", "EUR", "euros", "euro"], 1.17, [[BaseUnit.Dollar, 1]]),
-		new NamedUnit(["£", "GBP", "british pounds"], 1.32, [[BaseUnit.Dollar, 1]]),
-		new NamedUnit(["₽", "RUB", "ruble", "rubles"], 0.017, [[BaseUnit.Dollar, 1]])
+		new NamedUnit(["€", "EUR", "eur", "euros", "euro"], 1.17, [[BaseUnit.Dollar, 1]]),
+		new NamedUnit(["£", "GBP", "gbp", "british pounds"], 1.32, [[BaseUnit.Dollar, 1]]),
+		new NamedUnit(["₽", "RUB", "rub", "ruble", "rubles"], 0.017, [[BaseUnit.Dollar, 1]])
 	];
 
 	public static basicUnits: NamedUnit[];

@@ -205,7 +205,7 @@ export class Unit {
 	}
 
 	public static getPrefixLexerRule(): string {
-		var result = "UNITPREFIX : ";
+		var result = "fragment UNITPREFIX : ";
 		var first = true;
 		for (var tuple of Unit.prefixes) {
 			if (!first) {
