@@ -110,6 +110,38 @@ export class Unit {
 		[-24, "y", "yocto"]
 	];
 
+	private static prefixNames: string[] | null;
+
+	private static initializePrefixNames() {
+		Unit.prefixNames = [];
+		for (var tuple of Unit.prefixes) {
+			Unit.prefixNames!.push(tuple[1]);
+			Unit.prefixNames!.push(tuple[2]);
+		}
+	}
+
+	public static parsePrefixedUnit(value: string): Unit {
+		if (value.indexOf(' ') != -1) {
+			var prefix = value.substr(0, value.indexOf(' ')).trim();
+			var unitName = value.substr(value.indexOf(' ') + 1).trim();
+			return new Unit(Math.pow(10, Unit.getPrefix(prefix)), NamedUnit.get(unitName).exponents);
+		}
+		if (Unit.prefixNames == null) {
+			Unit.initializePrefixNames();
+		}
+
+		for (var prefixName of Unit.prefixNames!) {
+			if (value.startsWith(prefixName)) {
+				var unitName = value.substr(prefixName.length).trim();
+				if (NamedUnit.exists(unitName)) {
+					return new Unit(Math.pow(10, Unit.getPrefix(prefixName)), NamedUnit.get(unitName).exponents);
+				}
+			}
+		}
+
+		throw new Error(value + " is not a unit.");
+	}
+
 	public static getPrefix(name: string): number {
 		for (var tuple of Unit.prefixes) {
 			if (tuple[1] == name || tuple[2] == name) {

@@ -100,6 +100,15 @@ export class NamedUnit extends Unit {
 		throw new Error(name + " is not a named unit.");
 	}
 
+	public static exists(name: string): boolean {
+		for (var item of NamedUnit.items) {
+			if (item.names.indexOf(name) != -1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static getLexerRule(): string {
 		var result = "NAMEDUNIT : ";
 		var first = true;

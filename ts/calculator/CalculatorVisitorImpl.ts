@@ -1,21 +1,35 @@
 import { CalculatorVisitor } from "../generated/CalculatorVisitor";
 import { Result } from "./Result";
 import { TinyNumber } from "../language/TinyNumber";
+import { Unit } from "../calculator/units/Unit";
+import { NamedUnit } from "../calculator/units/NamedUnit";
 
-import { ExprInvertContext } from '../generated/CalculatorParser';
-import { ExprVariableContext } from '../generated/CalculatorParser';
-import { ExprAddSubContext } from '../generated/CalculatorParser';
-import { ExprFunctioncallContext } from '../generated/CalculatorParser';
-import { ExprPowerContext } from '../generated/CalculatorParser';
-import { ExprNumberContext } from '../generated/CalculatorParser';
-import { ExprMulDivContext } from '../generated/CalculatorParser';
-import { ExprParenthesesContext } from '../generated/CalculatorParser';
-import { StatementExpressionContext } from '../generated/CalculatorParser';
-import { StatementContext } from '../generated/CalculatorParser';
-import { AssignmentContext } from '../generated/CalculatorParser';
-import { ExpressionContext } from '../generated/CalculatorParser';
-import { NumberContext } from '../generated/CalculatorParser';
-import { ExprTinyPowerContext } from '../generated/CalculatorParser';
+import {
+	ExprInvertContext,
+	ExprVariableContext,
+	ExprAddSubContext,
+	ExprFunctioncallContext,
+	ExprPowerContext,
+	ExprNumberContext,
+	ExprMulDivContext,
+	ExprParenthesesContext,
+	StatementExpressionContext,
+	StatementContext,
+	AssignmentContext,
+	ExpressionContext,
+	ExprTinyPowerContext,
+	NumberContext,
+	UnitParenthesesContext,
+	UnitPowerContext,
+	UnitTinyPowerContext,
+	UnitDivisionContext,
+	UnitProductContext,
+	UnitSquaredContext,
+	UnitCubedContext,
+	UnitNameContext,
+	UnitContext,
+	UnitWithPrefixContext
+ } from '../generated/CalculatorParser';
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
 import { ParseTree } from 'antlr4ts/tree/ParseTree';
@@ -60,7 +74,6 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	visitExprFunctioncall(ctx: ExprFunctioncallContext): Result {
 		let functionName = ctx.ID().text;
 		let parameters = [];
-		console.log();
 		for (var i = 0; i < ctx.childCount; i++) {
 			if (ctx.getChild(i) instanceof ExpressionContext) {
 				parameters.push(ctx.getChild(i).accept(this));
@@ -81,7 +94,8 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprNumber(ctx: ExprNumberContext) : Result {
-		return new Result(ctx.number().accept(this));
+		var unit = ctx.unit() == undefined ? new Unit() : ctx.unit()!.accept(this);
+		return new Result(ctx.number().accept(this), unit);
 	}
 
 	visitExprMulDiv(ctx: ExprMulDivContext) : Result {
@@ -96,7 +110,9 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprParentheses(ctx: ExprParenthesesContext) : Result {
-		return ctx.expression().accept(this);
+		var unit = ctx.unit() == undefined ? new Unit() : ctx.unit()!.accept(this);
+		var innerResult = ctx.expression().accept(this);
+		return new Result(innerResult.value, innerResult.unit.createMultiple(unit));
 	}
 
 	visitStatementExpression(ctx: StatementExpressionContext): Result {
@@ -131,7 +147,55 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 
 	visitExprTinyPower(ctx: ExprTinyPowerContext): Result {
 		var exponent = TinyNumber.parse(ctx.TINYNUMBER().text);
-		return new Result(Math.pow(ctx.expression().accept(this).value, exponent));
+		var unit = ctx.unit() == undefined ? new Unit() : ctx.unit()!.accept(this);
+		return new Result(Math.pow(ctx.expression().accept(this).value, exponent), unit);
+		// TODO pass unit
+	}
+
+	visitUnitParentheses(ctx: UnitParenthesesContext): Unit {
+		return ctx.unit().accept(this);
+	}
+
+	visitUnitCubed(ctx: UnitCubedContext) : Unit {
+		var unit = ctx.unit().accept(this);
+		return unit.power(3);
+	}
+
+	visitUnitPower(ctx: UnitPowerContext): Unit {
+		return ctx.unit().accept(this).power(ctx.number().accept(this));
+	}
+
+	visitUnitTinyPower(ctx: UnitTinyPowerContext) : Unit {
+		return ctx.unit().accept(this).power(TinyNumber.parse(ctx.TINYNUMBER().text));
+	}
+
+	visitUnitDivision(ctx: UnitDivisionContext) : Unit {
+		var left = ctx.unit(0).accept(this);
+		var right = ctx.unit(1).accept(this);
+		return left.divideBy(right);
+	}
+
+	visitUnitProduct(ctx: UnitProductContext) {
+		var left = ctx.unit(0).accept(this);
+		var right = ctx.unit(1).accept(this);
+		return left.multiplyWith(right);
+	}
+
+	visitUnitSquared(ctx: UnitSquaredContext) {
+		var unit = ctx.unit().accept(this);
+		return unit.power(2);
+	}
+
+	visitUnitName(ctx: UnitNameContext): Unit {
+		return new Unit(1, NamedUnit.get(ctx.NAMEDUNIT().text).exponents);
+	}
+
+	visitUnitWithPrefix(ctx: UnitWithPrefixContext): Unit {
+		return Unit.parsePrefixedUnit(ctx.PREFIXEDUNIT().text);
+	}
+
+	visitUnit(ctx: UnitContext): Unit {
+		return ctx.accept(this);
 	}
 
 	visit(tree: ParseTree): any {

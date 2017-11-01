@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "antlr": "antlr4ts -visitor Calculator.g4 -o ts/generated/",
+    "antlr": "antlr4ts -visitor -no-listener Calculator.g4 -o ts/generated/",
     "ts": "tsc --moduleResolution node && node postprocess.js && webpack"
   },
   "author": "",

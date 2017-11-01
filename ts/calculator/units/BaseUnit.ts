@@ -1,6 +1,6 @@
 export enum BaseUnit {
 	Meter = "m",
-	Kilogram = "KILOGRAM",
+	Kilogram = "kg",
 	Second = "s",
 	Ampere = "A",
 	Kelvin = "K",
