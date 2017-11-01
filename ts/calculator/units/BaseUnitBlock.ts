@@ -1,4 +1,5 @@
 import { BaseUnit } from "./BaseUnit";
+import { TinyNumber } from "../../language/TinyNumber";
 
 export class BaseUnitBlock {
 	public static readonly one = new BaseUnitBlock();
@@ -14,6 +15,18 @@ export class BaseUnitBlock {
 		}
 	}
 
+	public toString(): string {
+		var result = "";
+		for (var key in this.exponents) {
+			result += key;
+			var exp = this.exponents[key];
+			if (exp != 1) {
+				result += TinyNumber.create(exp);
+			}
+		}
+		return result;
+	}
+
 	public createCopy(): BaseUnitBlock {
 		var paramExponents: [BaseUnit, number][] = [];
 		for (var baseUnit in this.exponents) {
@@ -25,11 +38,11 @@ export class BaseUnitBlock {
 	public getDistance(block: BaseUnitBlock): number {
 		var result = 0;
 		for (var key in this.exponents) {
-			result += this.exponents[key] - block.getExponent(key as BaseUnit);
+			result += Math.abs(this.exponents[key] - block.getExponent(key as BaseUnit));
 		}
 		for (var baseUnit of block.getActiveBaseUnits()) {
 			if (this.exponents[baseUnit] == undefined) {
-				result -= block.getExponent(baseUnit);
+				result += Math.abs(block.getExponent(baseUnit));
 			}
 		}
 		return result;

@@ -32,8 +32,8 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["cd", "candela", "candelas"], 1, [[BaseUnit.Candela, 1]]),
 		new NamedUnit(["%", "percent"], 1, [[BaseUnit.Percent, 1]]),
 		new NamedUnit(["rad", "radian", "radians"], 1, [[BaseUnit.Radian, 1]]),
-		new NamedUnit(["bit", "b", "bits"], 1, [[BaseUnit.Kilogram, 1]]),
-		new NamedUnit(["USD", "$", "dollar", "dollars"], 1, [[BaseUnit.Kilogram, 1]]),
+		new NamedUnit(["bit", "b", "bits"], 1, [[BaseUnit.Bit, 1]]),
+		new NamedUnit(["USD", "$", "dollar", "dollars"], 1, [[BaseUnit.Dollar, 1]]),
 
 		new NamedUnit(["miles", "mile"], 1609.34, [[BaseUnit.Meter, 1]]),
 		new NamedUnit(["nautical mile", "nautical miles"], 1.852e3, [[BaseUnit.Meter, 1]]),

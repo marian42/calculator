@@ -25,12 +25,32 @@ export class Unit {
 		this.prefixExponents = {};
 	}
 
+	public multiplyWith(unit: Unit): Unit {
+		return new Unit(this.factor * unit.factor, this.exponents.createSum(unit.exponents));
+	}
+
+	public divideBy(unit: Unit): Unit {
+		return new Unit(this.factor / unit.factor, this.exponents.createSum(unit.exponents.createMultiple(-1)));
+	}
+
+	public power(exponent: number): Unit {
+		return new Unit(Math.pow(this.factor, exponent), this.exponents.createMultiple(exponent));
+	}
+
 	public toString(): [string, number] {
+		if (this.exponents.getActiveBaseUnits().length == 0) {
+			return ["", 1 / this.factor];
+		} else {
+			return [this.exponents.toString(), 1 / this.factor];
+		}
+
+		/*
 		var currentBlock = this.exponents.createCopy();
 		var names = this.preferredNames.slice();
 
 		var resultComposition: [NamedUnit, number][] = [];
 
+		var c = 20;
 		while (names.length > 0) {
 			var bestFactor = 0;
 			var bestUnit : NamedUnit | null = null;
@@ -49,13 +69,36 @@ export class Unit {
 			}
 			resultComposition.push([bestUnit, bestFactor]);
 			currentBlock = currentBlock.createSum(bestUnit.exponents.createMultiple(-bestFactor));
-		}
+			names.splice(names.indexOf(bestUnit));
 
+			c--;
+			if (c == 0) {
+				throw new Error("loop1 failed.");
+			}
+		}
 		while (!currentBlock.isOne()) {
-			var namedUnit = NamedUnit.basicUnits.slice().sort((item) => -Math.abs(currentBlock.getBestFactor(item.exponents)))[0];
-			var factor = currentBlock.getBestFactor(namedUnit.exponents);
-			resultComposition.push([namedUnit, factor]);
-			currentBlock = currentBlock.createSum(namedUnit.exponents.createMultiple(factor));
+			console.log("block: " + currentBlock.toString());
+			var bestDistance = currentBlock.getDistance(BaseUnitBlock.one);
+			var bestUnit = NamedUnit.basicUnits[0];
+			for (var namedUnit of NamedUnit.basicUnits) {
+				var distance = currentBlock.getDistance(namedUnit.exponents.createMultiple(currentBlock.getBestFactor(namedUnit.exponents)));
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					bestUnit = namedUnit;
+				}
+			}
+
+
+			var factor = currentBlock.getBestFactor(bestUnit.exponents);
+			console.log("block: " + currentBlock.toString() + ", unit: " + bestUnit.names[0] + ", factor: " + factor);
+			resultComposition.push([bestUnit, factor]);
+			currentBlock = currentBlock.createSum(bestUnit.exponents.createMultiple(-factor));
+			console.log("/ " + bestUnit.names[0] + " ==> " + currentBlock.toString());
+
+			c--;
+			if (c == 0) {
+				throw new Error("loop2 failed.");
+			}
 		}
 
 		resultComposition.sort(tuple => -tuple[1]);
@@ -86,6 +129,7 @@ export class Unit {
 		}
 
 		return [result, currentFactor];
+		*/
 	}
 
 	public static readonly prefixes: [[number, string, string]] = [
