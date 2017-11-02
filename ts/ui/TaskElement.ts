@@ -5,12 +5,15 @@ export class TaskElement {
 
 	public readonly task: Task;
 
+	public nextElement: TaskElement | null;
+
 	public readonly htmlElement: HTMLElement;
 	public readonly queryElement: HTMLInputElement;
 	public readonly resultElement: HTMLSpanElement;
 
 	public constructor(task: Task, container: HTMLElement) {
 		this.task = task;
+		this.nextElement = null;
 
 		if (TaskElement.elementPrototype == null) {
 			TaskElement.elementPrototype = document.getElementById("taskPrototype") as HTMLElement;
@@ -38,13 +41,16 @@ export class TaskElement {
 		}
 	}
 
-	public readQueryAndUpdate() {
+	public readQueryAndUpdate(forceUpdate = false) {
 		var newQuery = this.queryElement.value;
-		if (newQuery == this.task.query) {
+		if (newQuery == this.task.query && !forceUpdate) {
 			return;
 		}
 		this.task.update(newQuery);
 		this.showResult();
+		if (this.nextElement != null) {
+			this.nextElement.readQueryAndUpdate(true);
+		}
 	}
 
 	public focus() {

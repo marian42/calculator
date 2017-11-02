@@ -4,22 +4,26 @@ import { ANTLRInputStream, CommonTokenStream } from 'antlr4ts';
 import { CalculatorLexer } from "../generated/CalculatorLexer";
 import { CalculatorParser } from "../generated/CalculatorParser";
 import { CalculatorVisitorImpl } from "../calculator/CalculatorVisitorImpl";
-import { CalculatorContext } from "./CalculatorContext";
+import { Constants } from "./Constants";
 
 export class Task {
+	public readonly previousTask: Task | null;
+
 	public query: string;
 	public result: Result | null;
 	public error: Error | null;
 
+	public exportedVariable: string | null;
+
 	public parser: CalculatorParser | null;
 
-	public readonly context: CalculatorContext;
-
-	constructor(context: CalculatorContext) {
+	constructor(previousTask?: Task) {
 		this.query = "";
 		this.result = null;
 		this.error = null;
-		this.context = context;
+		if (previousTask != undefined) {
+			this.previousTask = previousTask;
+		}
 	}
 
 	update(query: string): void {
@@ -32,10 +36,27 @@ export class Task {
 			let tokenStream = new CommonTokenStream(lexer);
 			this.parser = new CalculatorParser(tokenStream);
 
-			let visitor = new CalculatorVisitorImpl(this.context);
+			let visitor = new CalculatorVisitorImpl(this);
 			this.result = this.parser.statement().accept(visitor);
 		} catch (e) {
 			this.error = e;
 		}
+	}
+
+	public resolveName(name: string): Result {
+		if (this.previousTask != null && this.previousTask.exportedVariable != null && this.previousTask.exportedVariable == name && this.previousTask.result != null) {
+			return this.previousTask.result!;
+		}
+		if ((name == "ans" || name == "answer") && this.previousTask != null && this.previousTask.result != null) {
+			return this.previousTask.result!;
+		}
+		if (this.previousTask == null) {
+			if (Constants.constants[name] != undefined) {
+				return Constants.constants[name];
+			} else {
+				throw new Error("Unknown identifier: " + name);
+			}
+		}
+		return this.previousTask.resolveName(name);
 	}
 }

@@ -1,25 +1,23 @@
 import { Result } from "./Result";
 import { CalculatorFunction, UnaryFunction, NumberFunction, LambdaFunction } from "./CalculatorFunction";
 
-export class CalculatorContext {
-	public readonly variables: {[index: string] : Result};
-	public readonly constants: {[index: string] : Result};
-	public readonly functions: {[index: string] : CalculatorFunction};
+export class Constants {
+	public static constants: {[index: string] : Result};
+	public static functions: {[index: string] : CalculatorFunction};
 
-	constructor() {
-		this.variables = {};
-		this.constants = this.createConstants();
-		this.functions = this.createFunctions();
+	static initialize() {
+		Constants.constants = Constants.createConstants();
+		Constants.functions = Constants.createFunctions();
 	}
 
-	private createConstants() : {[index: string] : Result} {
+	private static createConstants() : {[index: string] : Result} {
 		return {
 			"pi": new Result(Math.PI),
 			"e": new Result(Math.E)
 		};
 	}
 
-	private createFunctions() : {[index: string] : CalculatorFunction} {
+	private static createFunctions() : {[index: string] : CalculatorFunction} {
 		return {
 			"sin": new NumberFunction(Math.sin),
 			"cos": new NumberFunction(Math.cos),
@@ -67,3 +65,5 @@ export class CalculatorContext {
 		};
 	}
 }
+
+Constants.initialize();

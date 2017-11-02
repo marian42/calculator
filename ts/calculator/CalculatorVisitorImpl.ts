@@ -36,13 +36,14 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree';
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
 import { RuleNode } from 'antlr4ts/tree/RuleNode';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
-import { CalculatorContext } from "./CalculatorContext";
+import { Task } from './Task';
+import { Constants } from './Constants';
 
 export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
-	private readonly context : CalculatorContext;
+	private readonly task : Task;
 
-	constructor(context: CalculatorContext) {
-		this.context = context;
+	constructor(task: Task) {
+		this.task = task;
 	}
 
 	visitExprInvert(ctx: ExprInvertContext) : Result {
@@ -52,13 +53,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 
 	visitExprVariable(ctx: ExprVariableContext): Result {
 		let variableName = ctx.ID().text;
-		if (this.context.variables[variableName] != undefined) {
-			return this.context.variables[variableName];
-		}
-		if (this.context.constants[variableName] != undefined) {
-			return this.context.constants[variableName];
-		}
-		throw new Error("Unknown identifier: " + variableName);
+	 	return this.task.resolveName(variableName);
 	}
 
 	visitExprAddSub(ctx: ExprAddSubContext) : Result {
@@ -80,8 +75,8 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 				parameters.push(ctx.getChild(i).accept(this));
 			}
 		}
-		if (this.context.functions[functionName] != undefined) {
-			return this.context.functions[functionName].invoke(parameters);
+		if (Constants.functions[functionName] != undefined) {
+			return Constants.functions[functionName].invoke(parameters);
 		}
 
 		throw new Error("Unknown function identifier " + functionName);
@@ -117,6 +112,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitStatementExpression(ctx: StatementExpressionContext): Result {
+		this.task.exportedVariable = null;
 		return ctx.expression().accept(this);
 	}
 
@@ -126,9 +122,8 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 
 	visitAssignment(ctx: AssignmentContext): Result {
 		let variableName = ctx.ID().text;
-		let result = ctx.expression().accept(this);
-		this.context.variables[variableName] = result;
-		return result;
+		this.task.exportedVariable = variableName;
+		return ctx.expression().accept(this);
 	}
 
 	visitExpression(ctx: ExpressionContext): Result {
