@@ -57,6 +57,10 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	 	return this.task.resolveName(variableName);
 	}
 
+	visitName(ctx: NameContext): string {
+		return ctx.text;
+	}
+
 	visitExprAddSub(ctx: ExprAddSubContext) : Result {
 		let left: Result = ctx.expression(0).accept(this);
 		let right: Result = ctx.expression(1).accept(this);

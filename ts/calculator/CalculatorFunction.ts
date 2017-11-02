@@ -19,14 +19,24 @@ export class UnaryFunction extends CalculatorFunction {
 
 export class NumberFunction extends CalculatorFunction {
 	private func : (arg: number) => number;
+	private keepUnit: boolean;
 
-	constructor(func : (arg : number) => number) {
+	constructor(func : (arg : number) => number, keepUnit?: boolean) {
 		super();
 		this.func = func;
+		if (keepUnit != undefined) {
+			this.keepUnit = keepUnit!;
+		} else {
+			this.keepUnit = false;
+		}
 	}
 
 	invoke(args: Result[]): Result {
-		return new Result(this.func(args[0].value));
+		if (this.keepUnit) {
+			return new Result(this.func(args[0].value), args[0].unit);
+		} else {
+			return new Result(this.func(args[0].toNumber()));
+		}
 	}
 }
 

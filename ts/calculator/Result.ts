@@ -28,6 +28,10 @@ export class Result {
 		return Result.formatNumber(this.value * unitAndRemainder[1]) + unitAndRemainder[0];
 	}
 
+	public toNumber(): number {
+		return this.value * this.unit.factor;
+	}
+
 	private static numberToString(value: number, maxDecimalPoints = 8): string {
 		var lower = Math.floor(value);
 		var upper = Math.ceil(value);

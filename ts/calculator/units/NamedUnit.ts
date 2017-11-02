@@ -78,7 +78,7 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["Pa", "pascal", "pascals"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, -1], [BaseUnit.Second, -2]]),
 		new NamedUnit(["bar"], 1e5, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, -1], [BaseUnit.Second, -2]]),
 		new NamedUnit(["psi"], 6.894757e3, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, -1], [BaseUnit.Second, -2]]),
-		new NamedUnit(["°", "deg", "degree", "degrees"], 17.45e-3, [[BaseUnit.Radian, 1]]),
+		new NamedUnit(["°", "deg", "degree", "degrees"], Math.PI / 180, [[BaseUnit.Radian, 1]]),
 		new NamedUnit(["Sv", "sievert", "sieverts"], 1, [[BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["min", "minute", "minutes"], 60, [[BaseUnit.Second, 1]]),
 		new NamedUnit(["h", "hour", "hours"], 3600, [[BaseUnit.Second, 1]]),
