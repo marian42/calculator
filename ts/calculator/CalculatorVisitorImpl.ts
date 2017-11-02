@@ -28,7 +28,8 @@ import {
 	UnitCubedContext,
 	UnitNameContext,
 	UnitContext,
-	UnitWithPrefixContext
+	UnitWithPrefixContext,
+	NameContext
  } from '../generated/CalculatorParser';
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
@@ -52,7 +53,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprVariable(ctx: ExprVariableContext): Result {
-		let variableName = ctx.ID().text;
+		let variableName = ctx.name().text;
 	 	return this.task.resolveName(variableName);
 	}
 
@@ -68,7 +69,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprFunctioncall(ctx: ExprFunctioncallContext): Result {
-		let functionName = ctx.ID().text;
+		let functionName = ctx.name().text;
 		let parameters: Result[] = [];
 		for (var i = 0; i < ctx.childCount; i++) {
 			if (ctx.getChild(i) instanceof ExpressionContext) {
@@ -121,8 +122,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitAssignment(ctx: AssignmentContext): Result {
-		let variableName = ctx.ID().text;
-		this.task.exportedVariable = variableName;
+		this.task.exportedVariable = ctx.name().text;
 		return ctx.expression().accept(this);
 	}
 

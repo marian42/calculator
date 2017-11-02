@@ -4,7 +4,7 @@ grammar Calculator;
 // Parser rules
 statement :
 	expression									# statementExpression
-	| ID ASSIGN expression						# assignment
+	| name ASSIGN expression					# assignment
 ;
 
 expression :
@@ -15,8 +15,8 @@ expression :
 	| expression op=(ADD | SUB) expression		# exprAddSub
 	| number unit?								# exprNumber
 	| '(' expression ')' unit?					# exprParentheses
-	| ID '(' (expression (',' expression)*)? ')'# exprFunctioncall
-	| ID										# exprVariable
+	| name '(' (expression (',' expression)*)? ')'# exprFunctioncall
+	| name										# exprVariable
 ;
 
 unit :
@@ -32,6 +32,8 @@ unit :
 ;
 
 number : NUM;
+
+name: ID | NAMEDUNIT | PREFIXEDUNIT;
 
 // Lexer rules
 
