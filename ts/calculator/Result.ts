@@ -1,16 +1,20 @@
 import { TinyNumber } from "../language/TinyNumber";
 import { Unit } from "./units/Unit";
+import { BaseUnit } from "./units/BaseUnit";
+import { BaseUnitBlock } from "./units/BaseUnitBlock"; 
 
 export class Result {
 	public readonly value: number;
 	public readonly unit: Unit;
 
-	public constructor(value: number, unit?: Unit) {
+	public constructor(value: number, unit?: Unit | [BaseUnit, number][]) {
 		this.value = value;
 		if (unit == undefined) {
 			this.unit = new Unit();
-		} else {
+		} else if (unit instanceof Unit) {
 			this.unit = unit;
+		} else {
+			this.unit = new Unit(1, new BaseUnitBlock(unit as [BaseUnit, number][]));
 		}
 	}
 
