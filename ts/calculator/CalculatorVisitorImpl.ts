@@ -12,6 +12,7 @@ import {
 	ExprFunctioncallContext,
 	ExprPowerContext,
 	ExprNumberContext,
+	ExprCurrencyContext,
 	ExprMulDivContext,
 	ExprParenthesesContext,
 	StatementExpressionContext,
@@ -109,6 +110,11 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 
 	visitExprNumber(ctx: ExprNumberContext) : Result {
 		var unit = ctx.unit() == undefined ? new Unit() : ctx.unit()!.accept(this);
+		return new Result(ctx.number().accept(this), unit);
+	}
+
+	visitExprCurrency(ctx: ExprCurrencyContext) : Result {
+		var unit =  NamedUnit.get(ctx.CURRENCY().text);
 		return new Result(ctx.number().accept(this), unit);
 	}
 
@@ -211,7 +217,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitUnitName(ctx: UnitNameContext): Unit {
-		return NamedUnit.get(ctx.NAMEDUNIT().text);
+		return NamedUnit.get(ctx.getChild(0).text);
 	}
 
 	visitUnitWithPrefix(ctx: UnitWithPrefixContext): Unit {
