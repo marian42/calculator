@@ -5,6 +5,7 @@ import { CalculatorLexer } from "../generated/CalculatorLexer";
 import { CalculatorParser } from "../generated/CalculatorParser";
 import { CalculatorVisitorImpl } from "../calculator/CalculatorVisitorImpl";
 import { Constants } from "./Constants";
+import { CustomFunction, CalculatorFunction } from "./CalculatorFunction";
 
 export class Task {
 	public readonly previousTask: Task | null;
@@ -14,6 +15,7 @@ export class Task {
 	public error: Error | null;
 
 	public exportedVariable: string | null;
+	public exportedFunction: CustomFunction | null;
 
 	public parser: CalculatorParser | null;
 
@@ -40,6 +42,7 @@ export class Task {
 			this.result = this.parser.statement().accept(visitor);
 		} catch (e) {
 			this.error = e;
+			console.error(e);
 		}
 	}
 
@@ -58,5 +61,19 @@ export class Task {
 			}
 		}
 		return this.previousTask.resolveName(name);
+	}
+
+	public resolveFunction(name: string): CalculatorFunction {
+		if (this.previousTask != null && this.previousTask.exportedFunction != null && this.previousTask.exportedFunction.name == name) {
+			return this.previousTask.exportedFunction;
+		}
+		if (this.previousTask != null) {
+			return this.previousTask.resolveFunction(name);
+		}
+		if (Constants.functions[name] != undefined) {
+			return Constants.functions[name];
+		}
+
+		throw new Error("Unknown function identifier " + name);
 	}
 }

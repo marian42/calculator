@@ -3,8 +3,9 @@ grammar Calculator;
 
 // Parser rules
 statement :
-	expression									# statementExpression
-	| name ASSIGN expression					# assignment
+	  name ASSIGN expression					# assignment
+	| name '(' name (',' name )* ')' ASSIGN expression # functionDefinition
+	| expression								# statementExpression
 ;
 
 expression :

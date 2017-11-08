@@ -30,7 +30,8 @@ import {
 	UnitNameContext,
 	UnitContext,
 	UnitWithPrefixContext,
-	NameContext
+	NameContext,
+	FunctionDefinitionContext
  } from '../generated/CalculatorParser';
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
@@ -40,9 +41,11 @@ import { RuleNode } from 'antlr4ts/tree/RuleNode';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { Task } from './Task';
 import { Constants } from './Constants';
+import { CustomFunction } from './CalculatorFunction';
 
 export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	private readonly task : Task;
+	public localVariables: {[index: string]: Result} | null;
 
 	constructor(task: Task) {
 		this.task = task;
@@ -55,6 +58,11 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 
 	visitExprVariable(ctx: ExprVariableContext): Result {
 		let variableName = ctx.name().text;
+
+		if (this.localVariables != null && this.localVariables![variableName] != undefined) {
+			return this.localVariables![variableName];
+		}
+
 	 	return this.task.resolveName(variableName);
 	}
 
@@ -89,11 +97,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 				parameters.push(ctx.getChild(i).accept(this));
 			}
 		}
-		if (Constants.functions[functionName] != undefined) {
-			return Constants.functions[functionName].invoke(parameters);
-		}
-
-		throw new Error("Unknown function identifier " + functionName);
+		return this.task.resolveFunction(functionName).invoke(parameters);
 	}
 
 	visitExprPower(ctx: ExprPowerContext) : Result {
@@ -127,6 +131,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 
 	visitStatementExpression(ctx: StatementExpressionContext): Result {
 		this.task.exportedVariable = null;
+		this.task.exportedFunction = null;
 		return ctx.expression().accept(this);
 	}
 
@@ -141,6 +146,16 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 
 	visitExpression(ctx: ExpressionContext): Result {
 		return ctx.accept(this);
+	}
+
+	visitFunctionDefinition(ctx: FunctionDefinitionContext) {
+		let names: string[] = [];
+		for (var i = 0; i < ctx.childCount; i++) {
+			if (ctx.getChild(i) instanceof NameContext) {
+				names.push(ctx.getChild(i).accept(this));
+			}
+		}
+		this.task.exportedFunction = new CustomFunction(names[0], ctx.expression(), this.task, names.slice(1));
 	}
 
 	visitNumber(ctx: NumberContext): number {
