@@ -28,7 +28,8 @@ input, textarea{
 }
 
 .card {
-	width: 1000px;
+	width: calc(100% - 30px);
+	max-width: 1200px;
 	margin: 0px auto;
 	position: relative;
 }
@@ -58,12 +59,14 @@ input:focus, textarea:focus {
 .task .query {
 	border: none;
 	padding: 25px;
+	padding-right: 0px;
 	width: calc(100% - 50px);
 }
 
 .task .result {
 	border: none;
 	padding: 25px;
+	padding-left:0px;
 	padding-right: 35px;
 	color: rgb(55, 255, 117);
 	position: absolute;
@@ -88,4 +91,24 @@ a {
 h1 a {
 	color:inherit;
 	text-decoration: none;
+}
+
+@media screen and (max-width: 600px) {
+    body, input, textarea {
+		font-size: 14pt;
+    }
+
+	.task .query {
+		padding: 15px;
+		padding-right: 0px;
+	}
+
+	.task .result {
+		padding: 15px;
+		padding-right: 15px;
+	}
+
+	.cards {
+		padding-bottom: 75px;
+	}
 }

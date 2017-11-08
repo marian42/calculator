@@ -34,10 +34,10 @@ export class TaskElement {
 	private showResult() {
 		if (this.task.result == null) {
 			this.resultElement.innerText = "";
-			this.queryElement.style.width = "calc(100% - 50px)";
+			this.queryElement.style.width = "calc(100% - 40px)";
 		} else {
 			this.resultElement.innerText = this.task.result!.toString();
-			this.queryElement.style.width = "calc(100% - 50px - " + this.resultElement.clientWidth + "px)";
+			this.queryElement.style.width = "calc(100% - 40px - " + this.resultElement.clientWidth + "px)";
 		}
 	}
 
