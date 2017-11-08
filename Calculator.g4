@@ -11,7 +11,7 @@ statement :
 expression :
 	  expression POW expression					# exprPower
 	| expression TINYNUMBER	unit?				# exprTinyPower
-	| expression op=(MUL | DIV) expression		# exprMulDiv
+	| expression op=(MUL | DIV | MOD) expression# exprMulDivMod
 	| SUB expression							# exprInvert
 	| expression op=(ADD | SUB) expression		# exprAddSub
 	| number unit?								# exprNumber
@@ -55,6 +55,7 @@ TINYNUMBER : ('⁺' | '⁻')? ('⁰' | '¹' | '²' | '³' | '⁴' | '⁵' | '⁶
 
 MUL : '*' | '✕' | '✖' | '⨉' | '⨯' | '·' | '∙' | '⋅' | 'times' | 'of';
 DIV : '/' | '÷' | 'divided by';
+MOD : 'mod' | 'modulo';
 ADD : '+' | 'plus';
 SUB : '-' | 'minus';
 POW : '^' | '**';

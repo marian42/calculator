@@ -13,7 +13,7 @@ import {
 	ExprPowerContext,
 	ExprNumberContext,
 	ExprCurrencyContext,
-	ExprMulDivContext,
+	ExprMulDivModContext,
 	ExprParenthesesContext,
 	StatementExpressionContext,
 	StatementContext,
@@ -118,7 +118,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		return new Result(ctx.number().accept(this), unit);
 	}
 
-	visitExprMulDiv(ctx: ExprMulDivContext) : Result {
+	visitExprMulDivMod(ctx: ExprMulDivModContext) : Result {
 		let left = ctx.expression(0).accept(this);
 		let right = ctx.expression(1).accept(this);
 
@@ -126,6 +126,8 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 			return new Result(left.value * right.value, left.unit.multiplyWith(right.unit));
 		} else if (ctx.DIV() != undefined) {
 			return new Result(left.value / right.value, left.unit.divideBy(right.unit));
+		} else if (ctx.MOD() != undefined) {
+			return new Result(left.value % right.value, left.unit.divideBy(right.unit));
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
 
