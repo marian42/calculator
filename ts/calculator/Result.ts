@@ -69,17 +69,17 @@ export class Result {
 	}
 
 	public convertTo(unit: Unit): number {
-		let value = this.value;
+		let value = this.value * this.unit.factor;
 
 		// Temperatures
 		if (this.unit.exponents.getExponentCount() == 1 && unit.exponents.getExponentCount() == 1) {
 			var kelvin = undefined;
 			if (this.unit.exponents.getExponent(BaseUnit.Kelvin) == 1) {
-				kelvin = this.value;
+				kelvin = value;
 			} else if (this.unit.exponents.getExponent(BaseUnit.Celsius) == 1) {
-				kelvin = this.value + 237.15;
+				kelvin = value + 273.15;
 			} else if (this.unit.exponents.getExponent(BaseUnit.Fahrenheit) == 1) {
-				kelvin = (this.value + 459.67) * 5/9;
+				kelvin = (value + 459.67) * 5/9;
 			}
 			if (kelvin != undefined) {
 				if (unit.exponents.getExponent(BaseUnit.Kelvin) == 1) {
@@ -91,6 +91,6 @@ export class Result {
 				}
 			}
 		}
-		return value * this.unit.factor / unit.factor;
+		return value / unit.factor;
 	}
 }
