@@ -84,9 +84,9 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		}
 
 		if (ctx.ADD() != undefined) {
-			return new Result(left.value + right.value * right.unit.factor / left.unit.factor, left.unit);
+			return new Result(left.value + right.convertTo(left.unit), left.unit);
 		} else if (ctx.SUB() != undefined) {
-			return new Result(left.value - right.value * right.unit.factor / left.unit.factor, left.unit);
+			return new Result(left.value - right.convertTo(left.unit), left.unit);
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
 

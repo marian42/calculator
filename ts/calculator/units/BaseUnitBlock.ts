@@ -118,4 +118,8 @@ export class BaseUnitBlock {
 	public isOne(): boolean {
 		return Object.keys(this.exponents).length == 0;
 	}
+
+	public getExponentCount(): number {
+		return Object.keys(this.exponents).length;
+	}
 }
