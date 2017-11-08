@@ -8,7 +8,7 @@ export enum BaseUnit {
 	Celsius = "C",
 	Mole = "mol",
 	Candela = "cd",
-	Percent = "%",
+	Percent = "x",
 	Radian = "rad",
 	Bit = "bit",
 	Dollar =  "$"

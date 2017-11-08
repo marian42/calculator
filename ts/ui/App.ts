@@ -1,22 +1,22 @@
 import { TaskElement } from "./TaskElement";
 import { Task } from "../calculator/Task";
-import { CalculatorContext } from "../calculator/CalculatorContext";
 
 export class App {
 	public taskContainer: HTMLElement;
 	public tasks: TaskElement[];
-	public context: CalculatorContext;
 
 	constructor() {
 		this.taskContainer = document.getElementsByClassName("cards").item(0) as HTMLElement;
 		this.tasks = [];
-		this.context = new CalculatorContext();
 		this.addTask().focus();
 	}
 
 	private addTask(): TaskElement {
-		var task = new Task(this.context);
+		var task = new Task(this.tasks.length > 0 ? this.tasks[this.tasks.length - 1].task : undefined);
 		var element = new TaskElement(task, this.taskContainer);
+		if (this.tasks.length > 0) {
+			this.tasks[this.tasks.length - 1].nextElement = element;
+		}
 		this.tasks.push(element);
 		let app = this;
 		element.queryElement.addEventListener("keydown", event => app.onKeyPress(event, element));
@@ -28,7 +28,6 @@ export class App {
 		if (event.keyCode == 13 && index == this.tasks.length - 1) {
 			let oldTaskElement = this.tasks[this.tasks.length - 1];
 			if (oldTaskElement.task.result != null) {
-				this.context.variables["ans"] = oldTaskElement.task.result!;
 			}
 			if (oldTaskElement.task.error != null) {
 				console.log(oldTaskElement.task.error);

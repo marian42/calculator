@@ -1,6 +1,7 @@
 import { CalculatorVisitor } from "../generated/CalculatorVisitor";
 import { Result } from "./Result";
 import { TinyNumber } from "../language/TinyNumber";
+import { BaseUnit } from "../calculator/units/BaseUnit";
 import { Unit } from "../calculator/units/Unit";
 import { NamedUnit } from "../calculator/units/NamedUnit";
 
@@ -11,7 +12,8 @@ import {
 	ExprFunctioncallContext,
 	ExprPowerContext,
 	ExprNumberContext,
-	ExprMulDivContext,
+	ExprCurrencyContext,
+	ExprMulDivModContext,
 	ExprParenthesesContext,
 	StatementExpressionContext,
 	StatementContext,
@@ -28,7 +30,9 @@ import {
 	UnitCubedContext,
 	UnitNameContext,
 	UnitContext,
-	UnitWithPrefixContext
+	UnitWithPrefixContext,
+	NameContext,
+	FunctionDefinitionContext
  } from '../generated/CalculatorParser';
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
@@ -36,13 +40,16 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree';
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode';
 import { RuleNode } from 'antlr4ts/tree/RuleNode';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
-import { CalculatorContext } from "./CalculatorContext";
+import { Task } from './Task';
+import { Constants } from './Constants';
+import { CustomFunction } from './CalculatorFunction';
 
 export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
-	private readonly context : CalculatorContext;
+	private readonly task : Task;
+	public localVariables: {[index: string]: Result} | null;
 
-	constructor(context: CalculatorContext) {
-		this.context = context;
+	constructor(task: Task) {
+		this.task = task;
 	}
 
 	visitExprInvert(ctx: ExprInvertContext) : Result {
@@ -51,19 +58,30 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprVariable(ctx: ExprVariableContext): Result {
-		let variableName = ctx.ID().text;
-		if (this.context.variables[variableName] != undefined) {
-			return this.context.variables[variableName];
+		let variableName = ctx.name().text;
+
+		if (this.localVariables != null && this.localVariables![variableName] != undefined) {
+			return this.localVariables![variableName];
 		}
-		if (this.context.constants[variableName] != undefined) {
-			return this.context.constants[variableName];
-		}
-		throw new Error("Unknown identifier: " + variableName);
+
+	 	return this.task.resolveName(variableName);
+	}
+
+	visitName(ctx: NameContext): string {
+		return ctx.text;
 	}
 
 	visitExprAddSub(ctx: ExprAddSubContext) : Result {
 		let left: Result = ctx.expression(0).accept(this);
 		let right: Result = ctx.expression(1).accept(this);
+
+		if (right.unit.exponents.getExponent(BaseUnit.Percent) == 1 && left.unit.exponents.getExponent(BaseUnit.Percent) == 0) {
+			if (ctx.ADD() != undefined) {
+				return new Result(left.value * (1 + right.toNumber()), left.unit);
+			} else if (ctx.SUB() != undefined) {
+				return new Result(left.value * (1 - right.toNumber()), left.unit);
+			} else throw Error("Unknown operand " + ctx._op.text);
+		}
 
 		if (ctx.ADD() != undefined) {
 			return new Result(left.value + right.value * right.unit.factor / left.unit.factor, left.unit);
@@ -73,18 +91,14 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprFunctioncall(ctx: ExprFunctioncallContext): Result {
-		let functionName = ctx.ID().text;
+		let functionName = ctx.name().text;
 		let parameters: Result[] = [];
 		for (var i = 0; i < ctx.childCount; i++) {
 			if (ctx.getChild(i) instanceof ExpressionContext) {
 				parameters.push(ctx.getChild(i).accept(this));
 			}
 		}
-		if (this.context.functions[functionName] != undefined) {
-			return this.context.functions[functionName].invoke(parameters);
-		}
-
-		throw new Error("Unknown function identifier " + functionName);
+		return this.task.resolveFunction(functionName).invoke(parameters);
 	}
 
 	visitExprPower(ctx: ExprPowerContext) : Result {
@@ -99,7 +113,12 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		return new Result(ctx.number().accept(this), unit);
 	}
 
-	visitExprMulDiv(ctx: ExprMulDivContext) : Result {
+	visitExprCurrency(ctx: ExprCurrencyContext) : Result {
+		var unit =  NamedUnit.get(ctx.CURRENCY().text);
+		return new Result(ctx.number().accept(this), unit);
+	}
+
+	visitExprMulDivMod(ctx: ExprMulDivModContext) : Result {
 		let left = ctx.expression(0).accept(this);
 		let right = ctx.expression(1).accept(this);
 
@@ -107,6 +126,8 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 			return new Result(left.value * right.value, left.unit.multiplyWith(right.unit));
 		} else if (ctx.DIV() != undefined) {
 			return new Result(left.value / right.value, left.unit.divideBy(right.unit));
+		} else if (ctx.MOD() != undefined) {
+			return new Result(left.value % right.value, left.unit.divideBy(right.unit));
 		} else throw Error("Unknown operand " + ctx._op.text);
 	}
 
@@ -117,6 +138,8 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitStatementExpression(ctx: StatementExpressionContext): Result {
+		this.task.exportedVariable = null;
+		this.task.exportedFunction = null;
 		return ctx.expression().accept(this);
 	}
 
@@ -125,14 +148,22 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitAssignment(ctx: AssignmentContext): Result {
-		let variableName = ctx.ID().text;
-		let result = ctx.expression().accept(this);
-		this.context.variables[variableName] = result;
-		return result;
+		this.task.exportedVariable = ctx.name().text;
+		return ctx.expression().accept(this);
 	}
 
 	visitExpression(ctx: ExpressionContext): Result {
 		return ctx.accept(this);
+	}
+
+	visitFunctionDefinition(ctx: FunctionDefinitionContext) {
+		let names: string[] = [];
+		for (var i = 0; i < ctx.childCount; i++) {
+			if (ctx.getChild(i) instanceof NameContext) {
+				names.push(ctx.getChild(i).accept(this));
+			}
+		}
+		this.task.exportedFunction = new CustomFunction(names[0], ctx.expression(), this.task, names.slice(1));
 	}
 
 	visitNumber(ctx: NumberContext): number {
@@ -188,7 +219,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitUnitName(ctx: UnitNameContext): Unit {
-		return NamedUnit.get(ctx.NAMEDUNIT().text);
+		return NamedUnit.get(ctx.getChild(0).text);
 	}
 
 	visitUnitWithPrefix(ctx: UnitWithPrefixContext): Unit {
