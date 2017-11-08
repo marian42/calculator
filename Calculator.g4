@@ -6,6 +6,7 @@ statement :
 	  name ASSIGN expression					# assignment
 	| name '(' name (',' name )* ')' ASSIGN expression # functionDefinition
 	| expression								# statementExpression
+	| 'convert'? expression ('to' | 'in') unit	# conversion
 ;
 
 expression :

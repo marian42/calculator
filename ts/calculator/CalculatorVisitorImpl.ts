@@ -32,7 +32,8 @@ import {
 	UnitContext,
 	UnitWithPrefixContext,
 	NameContext,
-	FunctionDefinitionContext
+	FunctionDefinitionContext,
+	ConversionContext
  } from '../generated/CalculatorParser';
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
@@ -164,6 +165,12 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 			}
 		}
 		this.task.exportedFunction = new CustomFunction(names[0], ctx.expression(), this.task, names.slice(1));
+	}
+
+	visitConversion(ctx: ConversionContext): Result {
+		var result = ctx.expression().accept(this);
+		var unit = ctx.unit().accept(this);
+		return new Result(result.convertTo(unit), unit);
 	}
 
 	visitNumber(ctx: NumberContext): number {
