@@ -30,7 +30,7 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["°C", "° C", "celsius", "degrees celsius"], 1, [[BaseUnit.Celsius, 1]]),
 		new NamedUnit(["mol", "mole", "moles"], 1, [[BaseUnit.Mole, 1]]),
 		new NamedUnit(["cd", "candela", "candelas"], 1, [[BaseUnit.Candela, 1]]),
-		new NamedUnit(["%", "percent"], 1, [[BaseUnit.Percent, 1]]),
+		new NamedUnit(["%", "percent"], 0.01, [[BaseUnit.Percent, 1]]),
 		new NamedUnit(["rad", "radian", "radians"], 1, [[BaseUnit.Radian, 1]]),
 		new NamedUnit(["bit", "b", "bits"], 1, [[BaseUnit.Bit, 1]]),
 		new NamedUnit(["USD", "usd", "$", "dollar", "dollars"], 1, [[BaseUnit.Dollar, 1]]),

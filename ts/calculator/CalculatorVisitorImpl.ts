@@ -1,6 +1,7 @@
 import { CalculatorVisitor } from "../generated/CalculatorVisitor";
 import { Result } from "./Result";
 import { TinyNumber } from "../language/TinyNumber";
+import { BaseUnit } from "../calculator/units/BaseUnit";
 import { Unit } from "../calculator/units/Unit";
 import { NamedUnit } from "../calculator/units/NamedUnit";
 
@@ -64,6 +65,14 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	visitExprAddSub(ctx: ExprAddSubContext) : Result {
 		let left: Result = ctx.expression(0).accept(this);
 		let right: Result = ctx.expression(1).accept(this);
+
+		if (right.unit.exponents.getExponent(BaseUnit.Percent) == 1 && left.unit.exponents.getExponent(BaseUnit.Percent) == 0) {
+			if (ctx.ADD() != undefined) {
+				return new Result(left.value * (1 + right.toNumber()), left.unit);
+			} else if (ctx.SUB() != undefined) {
+				return new Result(left.value * (1 - right.toNumber()), left.unit);
+			} else throw Error("Unknown operand " + ctx._op.text);
+		}
 
 		if (ctx.ADD() != undefined) {
 			return new Result(left.value + right.value * right.unit.factor / left.unit.factor, left.unit);
