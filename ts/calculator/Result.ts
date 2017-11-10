@@ -140,7 +140,7 @@ export class Result {
 	private static formatNumber(value: number): string {
 		const maxExponent = 5;
 		const minExponent = -5;
-		let exponent = Math.floor(Math.log10(value));
+		let exponent = Math.floor(Math.log10(Math.abs(value)));
 		if (exponent < minExponent || exponent > maxExponent) {
 			var base = value / Math.pow(10, exponent);
 			return Result.numberToString(base, 4) + "⨯10" + TinyNumber.create(exponent)
