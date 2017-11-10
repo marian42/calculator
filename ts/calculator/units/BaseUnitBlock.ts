@@ -122,4 +122,12 @@ export class BaseUnitBlock {
 	public getExponentCount(): number {
 		return Object.keys(this.exponents).length;
 	}
+
+	public getWeight(): number {
+		var result = 0;
+		for (var key in this.exponents) {
+			result += Math.abs(this.exponents[key])
+		}
+		return result;
+	}
 }

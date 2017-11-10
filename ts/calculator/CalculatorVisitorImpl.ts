@@ -226,7 +226,8 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitUnitName(ctx: UnitNameContext): Unit {
-		return NamedUnit.get(ctx.getChild(0).text);
+		var namedUnit = NamedUnit.get(ctx.getChild(0).text);
+		return new Unit(namedUnit.factor, namedUnit.exponents.createCopy(), [namedUnit]);
 	}
 
 	visitUnitWithPrefix(ctx: UnitWithPrefixContext): Unit {
