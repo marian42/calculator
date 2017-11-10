@@ -31,7 +31,7 @@ export class TaskElement {
 		this.queryElement.addEventListener("input", () => { el.readQueryAndUpdate(); });
 	}
 
-	private showResult() {
+	public showResult() {
 		if (this.task.result == null) {
 			this.resultElement.innerText = "";
 			this.queryElement.style.width = "calc(100% - 40px)";

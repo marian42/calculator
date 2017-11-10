@@ -5,10 +5,27 @@ export class App {
 	public taskContainer: HTMLElement;
 	public tasks: TaskElement[];
 
+	private url: URL;
+
 	constructor() {
 		this.taskContainer = document.getElementsByClassName("cards").item(0) as HTMLElement;
 		this.tasks = [];
+		this.checkUrlQuery();
 		this.addTask().focus();
+	}
+
+	private checkUrlQuery() {
+		this.url = new URL(window.location.href);
+		if (this.url.searchParams.get("q") == null) {
+			return;
+		}
+		var lines = this.url.searchParams.get("q")!.split("\n");
+		for (var line of lines) {
+			var task = this.addTask();
+			task.task.update(line);
+			task.queryElement.value = line;
+			task.showResult();
+		}
 	}
 
 	private addTask(): TaskElement {
@@ -20,30 +37,54 @@ export class App {
 		this.tasks.push(element);
 		let app = this;
 		element.queryElement.addEventListener("keydown", event => app.onKeyPress(event, element));
+		element.queryElement.addEventListener("blur", event => app.onBlur(event, element));
 		return element;
+	}
+
+	private updateQueryParameter() {
+		var result = "";
+		for (var task of this.tasks) {
+			result += task.task.query + "\n";
+		}
+		result = result.trim();
+		if (this.url.searchParams.get("q") == result) {
+			return;
+		}
+		this.url.searchParams.set("q", result);
+		history.replaceState(null, document.title, this.url.href);
 	}
 
 	private onKeyPress(event: KeyboardEvent, taskElement: TaskElement) {
 		let index = this.tasks.indexOf(taskElement);
-		if (event.keyCode == 13 && index == this.tasks.length - 1) {
-			let oldTaskElement = this.tasks[this.tasks.length - 1];
-			if (oldTaskElement.task.result != null) {
+		if (event.keyCode == 13 ) { // Enter
+			if (index == this.tasks.length - 1) {
+				let oldTaskElement = this.tasks[this.tasks.length - 1];
+				if (oldTaskElement.task.result != null) {
+				}
+				if (oldTaskElement.task.error != null) {
+					console.log(oldTaskElement.task.error);
+				}
+				let newTask = this.addTask();
+				newTask.queryElement.focus();
+				this.taskContainer.scrollTo(0, this.taskContainer.scrollHeight);
+			} else {
+				this.tasks[index + 1].focus();
 			}
-			if (oldTaskElement.task.error != null) {
-				console.log(oldTaskElement.task.error);
-			}
-			let newTask = this.addTask();
-			newTask.queryElement.focus();
-			this.taskContainer.scrollTo(0, this.taskContainer.scrollHeight);
+			this.onFinalize(taskElement);
 		}
-		if (event.keyCode == 13 && index < this.tasks.length - 1) {
-			this.tasks[index + 1].focus();
-		}
-		if (event.keyCode == 38) {
+		if (event.keyCode == 38) { // Up
 			this.tasks[(index - 1 + this.tasks.length) % this.tasks.length].focus();
 		}
-		if (event.keyCode == 40) {
+		if (event.keyCode == 40) { // Down
 			this.tasks[(index + 1) % this.tasks.length].focus();
 		}
+	}
+
+	private onFinalize(taskElement: TaskElement) {
+		this.updateQueryParameter();
+	}
+
+	private onBlur(event: Event, taskElement: TaskElement) {
+		this.onFinalize(taskElement);
 	}
 }
