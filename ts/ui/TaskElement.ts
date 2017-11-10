@@ -53,8 +53,12 @@ export class TaskElement {
 		}
 	}
 
-	public focus() {
+	public focus(moveCursorRight?: boolean) {
+		if (moveCursorRight == undefined) {
+			moveCursorRight = true;
+		}
 		this.queryElement.focus();
-		setTimeout(() => { this.queryElement.setSelectionRange(this.queryElement.value.length, this.queryElement.value.length); }, 0);
+		var position = moveCursorRight ? this.queryElement.value.length : 0;
+		setTimeout(() => { this.queryElement.setSelectionRange(position, position); }, 0);
 	}
 }
