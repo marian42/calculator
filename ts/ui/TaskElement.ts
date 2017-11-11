@@ -16,7 +16,7 @@ export class TaskElement {
 		this.nextElement = null;
 
 		if (TaskElement.elementPrototype == null) {
-			TaskElement.elementPrototype = document.getElementById("taskPrototype") as HTMLElement;
+			TaskElement.elementPrototype = document.getElementsByClassName("task")[0] as HTMLElement;
 			TaskElement.elementPrototype.parentElement!.removeChild(TaskElement.elementPrototype);
 		}
 

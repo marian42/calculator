@@ -78,7 +78,7 @@ export class App {
 				}
 				let newTask = this.addTask();
 				newTask.queryElement.focus();
-				this.taskContainer.scrollTo(0, this.taskContainer.scrollHeight);
+				window.scrollTo(0, this.taskContainer.scrollHeight);
 			} else {
 				this.tasks[index + 1].focus();
 			}
