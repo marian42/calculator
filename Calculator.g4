@@ -6,7 +6,7 @@ statement :
 	  name ASSIGN expression					# assignment
 	| name '(' name (',' name )* ')' ASSIGN expression # functionDefinition
 	| expression								# statementExpression
-	| 'convert'? expression ('to' | 'in') unit	# conversion
+	| 'convert'? expression CONVERT unit		# conversion
 ;
 
 expression :
@@ -64,6 +64,7 @@ COMMA : ',';
 ASSIGN : '=' | ':' | ':=';
 PLEFT : '(';
 PRIGHT : ')';
+CONVERT : 'to' | 'in' | '->' | '→' | '➞'
 
 ID : [_a-zA-Z][_a-zA-Z0-9]*;
 WS : (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN);
