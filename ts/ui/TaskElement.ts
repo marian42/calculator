@@ -67,6 +67,12 @@ export class TaskElement {
 		let tokenStream = new CommonTokenStream(lexer);
 		let parser = new CalculatorParser(tokenStream);
 		let visitor = new ParserTreeVisitor(this.task, lexer.vocabulary, parser.ruleNames);
+
+		tokenStream.fill();
+		var tokenDiv = document.createElement("div");
+		tokenDiv.textContent = "Tokens: " + tokenStream.getTokens().map(token => lexer.vocabulary.getDisplayName(token.type)).join(", ");
+		this.parseTreeContainer.appendChild(tokenDiv);
+
 		this.parseTreeContainer.appendChild(parser.statement().accept(visitor));
 	}
 
