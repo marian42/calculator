@@ -64,7 +64,7 @@ COMMA : ',';
 ASSIGN : '=' | ':' | ':=';
 PLEFT : '(';
 PRIGHT : ')';
-CONVERT : 'to' | 'in' | '->' | '→' | '➞'
+CONVERT : 'to' | 'in' | '->' | '→' | '➞';
 
 ID : [_a-zA-Z][_a-zA-Z0-9]*;
 WS : (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN);
