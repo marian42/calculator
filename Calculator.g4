@@ -67,4 +67,4 @@ PRIGHT : ')';
 CONVERT : 'to' | 'in' | '->' | '→' | '➞';
 
 ID : [_a-zA-Z][_a-zA-Z0-9]*;
-WS : (' ' | '\t' | '\r' | '\n') -> channel(HIDDEN);
+WS : (' ' | '\t' | '\r' | '\n')* -> channel(HIDDEN);

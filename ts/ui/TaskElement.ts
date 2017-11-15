@@ -70,7 +70,10 @@ export class TaskElement {
 
 		tokenStream.fill();
 		var tokenDiv = document.createElement("div");
-		tokenDiv.textContent = "Tokens: " + tokenStream.getTokens().map(token => lexer.vocabulary.getDisplayName(token.type)).join(", ");
+		tokenDiv.textContent = "Tokens: " + tokenStream.getTokens()
+			.map(token => lexer.vocabulary.getDisplayName(token.type))
+			.filter(name => name != "WS")
+			.join(", ");
 		this.parseTreeContainer.appendChild(tokenDiv);
 
 		this.parseTreeContainer.appendChild(parser.statement().accept(visitor));
