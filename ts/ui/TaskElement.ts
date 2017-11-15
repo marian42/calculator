@@ -1,4 +1,9 @@
 import { Task } from "../calculator/Task";
+import { ANTLRInputStream, CommonTokenStream } from 'antlr4ts';
+import { CalculatorLexer } from "../generated/CalculatorLexer";
+import { CalculatorParser } from "../generated/CalculatorParser";
+import { CalculatorVisitorImpl } from "../calculator/CalculatorVisitorImpl";
+import { ParserTreeVisitor } from "./ParseTreeVisitor";
 
 export class TaskElement {
 	public static elementPrototype: HTMLElement | null;
@@ -10,6 +15,8 @@ export class TaskElement {
 	public readonly htmlElement: HTMLElement;
 	public readonly queryElement: HTMLInputElement;
 	public readonly resultElement: HTMLSpanElement;
+
+	private parseTreeContainer: HTMLElement | null;
 
 	public constructor(task: Task, container: HTMLElement) {
 		this.task = task;
@@ -29,6 +36,8 @@ export class TaskElement {
 
 		var el = this;
 		this.queryElement.addEventListener("input", () => { el.readQueryAndUpdate(); });
+		this.queryElement.addEventListener("focus", () => { el.onFocus(); });
+		this.queryElement.addEventListener("blur", () => { el.onBlur(); });
 	}
 
 	public showResult() {
@@ -41,6 +50,26 @@ export class TaskElement {
 		}
 	}
 
+	private showParseTree() {
+		if (this.parseTreeContainer == null) {
+			var card = document.createElement("div");
+			card.classList.add("card");
+			this.parseTreeContainer = document.createElement("div");
+			this.parseTreeContainer.classList.add("contentcard");
+			card.appendChild(this.parseTreeContainer);
+			this.htmlElement.parentNode!.insertBefore(card, this.htmlElement);
+		}
+		while (this.parseTreeContainer.hasChildNodes()) {
+		    this.parseTreeContainer.removeChild(this.parseTreeContainer.lastChild!);
+		}
+		let inputStream = new ANTLRInputStream(this.task.query);
+		let lexer = new CalculatorLexer(inputStream);
+		let tokenStream = new CommonTokenStream(lexer);
+		let parser = new CalculatorParser(tokenStream);
+		let visitor = new ParserTreeVisitor(this.task, lexer.vocabulary, parser.ruleNames);
+		this.parseTreeContainer.appendChild(parser.statement().accept(visitor));
+	}
+
 	public readQueryAndUpdate(forceUpdate = false) {
 		var newQuery = this.queryElement.value;
 		if (newQuery == this.task.query && !forceUpdate) {
@@ -48,6 +77,7 @@ export class TaskElement {
 		}
 		this.task.update(newQuery);
 		this.showResult();
+		this.showParseTree();
 		if (this.nextElement != null) {
 			this.nextElement.readQueryAndUpdate(true);
 		}
@@ -60,5 +90,19 @@ export class TaskElement {
 		this.queryElement.focus();
 		var position = moveCursorRight ? this.queryElement.value.length : 0;
 		setTimeout(() => { this.queryElement.setSelectionRange(position, position); }, 0);
+	}
+
+	public onFocus() {
+		if (this.parseTreeContainer == null) {
+			this.showParseTree();
+		} else {
+			this.parseTreeContainer.style.display = "block";
+		}
+	}
+
+	public onBlur() {
+		if (this.parseTreeContainer != null) {
+			this.parseTreeContainer.style.display = "none";
+		}
 	}
 }

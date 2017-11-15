@@ -75,6 +75,7 @@ input:focus, textarea:focus {
 	font-size: 17px;
 	background-color: rgb(27, 31, 32);
 	margin-bottom: 10px;
+	margin-top: 10px;
 	letter-spacing: 0px;
 }
 
@@ -85,6 +86,24 @@ a {
 h1 a {
 	color:inherit;
 	text-decoration: none;
+}
+
+.parseTreeItem {
+	border-left: 2px solid #888888;
+	margin-left: 10px;
+	padding-left: 10px;
+	margin-top: 5px;
+	color: #888888;
+	font-family: monospace;
+}
+
+.parseTreeItem:hover {
+	border-left-color: rgb(43, 204, 255);
+	color: white;
+}
+
+.parseTreeItem .error {
+	border-left-color: red;
 }
 
 @media screen and (max-width: 600px) {
