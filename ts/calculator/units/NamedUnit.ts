@@ -65,6 +65,7 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["Wh", "watt hour", "watt hours"], 3600, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["hp", "horse power"], 745.7, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3]]),
 		new NamedUnit(["J", "joule", "joules"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
+		new NamedUnit(["cal", "calorie", "calories"], 4.184, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["eV", "electron volts"], 1.6021766e-19, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["V", "volt", "volts"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3], [BaseUnit.Ampere, -1]]),
 		new NamedUnit(["C", "coulomb"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3], [BaseUnit.Ampere, -1]]),

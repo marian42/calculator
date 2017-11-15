@@ -46,6 +46,12 @@ export class Constants {
 			"asinh": new NumberFunction(Math.asinh),
 			"atan": new NumberFunction(Math.atan),
 			"atanh": new NumberFunction(Math.atanh),
+			"atan2": new LambdaFunction((args) => {
+				if (args.length != 2) {
+					throw new Error("Invalid number of parameters for atan2() function.");
+				}
+				return new Result(Math.atan2(args[0].toNumber(), args[1].toNumber()));
+			}),
 			"ceil": new NumberFunction(Math.ceil, true),
 			"floor": new NumberFunction(Math.floor, true),
 			"cosh": new NumberFunction(Math.cosh),
