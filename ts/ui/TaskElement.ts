@@ -4,6 +4,7 @@ import { CalculatorLexer } from "../generated/CalculatorLexer";
 import { CalculatorParser } from "../generated/CalculatorParser";
 import { CalculatorVisitorImpl } from "../calculator/CalculatorVisitorImpl";
 import { ParserTreeVisitor } from "./ParseTreeVisitor";
+import { App } from "./App";
 
 export class TaskElement {
 	public static elementPrototype: HTMLElement | null;
@@ -17,6 +18,8 @@ export class TaskElement {
 	public readonly resultElement: HTMLSpanElement;
 
 	private parseTreeContainer: HTMLElement | null;
+
+	private focussed: boolean;
 
 	public constructor(task: Task, container: HTMLElement) {
 		this.task = task;
@@ -37,6 +40,7 @@ export class TaskElement {
 		var el = this;
 		this.queryElement.addEventListener("input", () => { el.readQueryAndUpdate(); });
 		this.queryElement.addEventListener("focus", () => { el.onFocus(); });
+		this.focussed = false;
 	}
 
 	public showResult() {
@@ -50,6 +54,9 @@ export class TaskElement {
 	}
 
 	private showParseTree() {
+		if (!this.focussed) {
+			return;
+		}
 		if (this.parseTreeContainer == null) {
 			var card = document.createElement("div");
 			card.classList.add("card");
@@ -57,6 +64,8 @@ export class TaskElement {
 			this.parseTreeContainer.classList.add("contentcard");
 			card.appendChild(this.parseTreeContainer);
 			this.htmlElement.parentNode!.insertBefore(card, this.htmlElement);
+		} else {
+			this.parseTreeContainer.style.display = "block";
 		}
 		while (this.parseTreeContainer.hasChildNodes()) {
 		    this.parseTreeContainer.removeChild(this.parseTreeContainer.lastChild!);
@@ -85,7 +94,9 @@ export class TaskElement {
 		}
 		this.task.update(newQuery);
 		this.showResult();
-		this.showParseTree();
+		if (App.instance.showParseTree) {
+			this.showParseTree();
+		}
 		if (this.nextElement != null) {
 			this.nextElement.readQueryAndUpdate(true);
 		}
@@ -101,16 +112,20 @@ export class TaskElement {
 	}
 
 	public onFocus() {
-		if (this.parseTreeContainer == null) {
+		this.focussed = true;
+		if (App.instance.showParseTree) {
 			this.showParseTree();
-		} else {
-			this.parseTreeContainer.style.display = "block";
+		}
+	}
+
+	public hideParseTree() {
+		if (this.parseTreeContainer != null) {
+			this.parseTreeContainer.style.display = "none";
 		}
 	}
 
 	public onUnselect() {
-		if (this.parseTreeContainer != null) {
-			this.parseTreeContainer.style.display = "none";
-		}
+		this.hideParseTree();
+		this.focussed = false;
 	}
 }

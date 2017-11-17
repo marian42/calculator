@@ -2,15 +2,20 @@ import { TaskElement } from "./TaskElement";
 import { Task } from "../calculator/Task";
 
 export class App {
+	public static instance: App;
+
 	public taskContainer: HTMLElement;
 	public tasks: TaskElement[];
+	public showParseTree: boolean;
 
 	public currentTask: TaskElement;
 
 	private url: URL;
 
 	constructor() {
+		App.instance = this;
 		this.taskContainer = document.getElementsByClassName("cards").item(0) as HTMLElement;
+		document.getElementById("debug")!.addEventListener("change", event => this.onToggleDebug(event));
 		this.tasks = [];
 		this.checkUrlQuery();
 		this.addTask().focus();
@@ -119,6 +124,17 @@ export class App {
 		}
 		if (this.currentTask != taskElement) {
 			this.currentTask = taskElement;
+		}
+	}
+
+	private onToggleDebug(event: Event) {
+		this.showParseTree = (event.srcElement as HTMLInputElement).checked;
+
+		if (this.showParseTree && this.currentTask != null) {
+			this.currentTask.onFocus();
+		}
+		if (!this.showParseTree && this.currentTask != null) {
+			this.currentTask.hideParseTree();
 		}
 	}
 }
