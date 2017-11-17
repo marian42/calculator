@@ -3,6 +3,7 @@ body {
 	margin: 0;
 	width: 100%;
 	height: 100%;
+	overflow-y: auto;
 }
 
 body, input, textarea {
@@ -20,11 +21,8 @@ input, textarea{
 	width: 100%;
 	position: absolute;
 	left: 0;
-	bottom: 0;
-	max-height: calc(100% - 115px);
-	padding-bottom: 115px;
-	overflow-y: overlay;
-	flex-direction: column-reverse;
+	bottom: 0px;
+	max-height: 100%;
 }
 
 .card {
@@ -40,12 +38,8 @@ input, textarea{
 
 .card:last-of-type {
 	background-color: #1f1f1f;
-	position: fixed;
-	bottom: 0;
-	margin: 0 auto;
 	margin-bottom: 15px;
-	left: 0;
-	right: 0;
+	margin-top: 10px;
 }
 
 .card:focus-within {
@@ -81,16 +75,46 @@ input:focus, textarea:focus {
 	font-size: 17px;
 	background-color: rgb(27, 31, 32);
 	margin-bottom: 10px;
+	margin-top: 10px;
 	letter-spacing: 0px;
 }
 
-a {
-	color: white;
+a  {
+	color: #D4D4D4;
 }
 
 h1 a {
 	color:inherit;
 	text-decoration: none;
+}
+
+.parseTreeItem {
+	border-left: 2px solid #888888;
+	margin-left: 10px;
+	padding-left: 10px;
+	margin-top: 5px;
+	color: #888888;
+	font-family: monospace;
+}
+
+.parseTreeItem:hover {
+	border-left-color: rgb(43, 204, 255);
+	color: white;
+}
+
+.parseTreeItem .error {
+	border-left-color: red;
+}
+
+input[type="checkbox" i] {
+	position: relative;
+	top: 1px;
+	margin-right: 6px;
+}
+
+.divider {
+	width: 20px;
+	display: inline-block;
 }
 
 @media screen and (max-width: 600px) {
@@ -110,5 +134,6 @@ h1 a {
 
 	.cards {
 		padding-bottom: 75px;
+		max-height: calc(100% - 75px);
 	}
 }

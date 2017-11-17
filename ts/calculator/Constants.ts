@@ -14,6 +14,7 @@ export class Constants {
 	private static createConstants() : {[index: string] : Result} {
 		return {
 			"pi": new Result(Math.PI),
+			"tau": new Result(2 * Math.PI),
 			"e": new Result(Math.E),
 			"c": new Result(299792458, [[BaseUnit.Meter, 1], [BaseUnit.Second, -1]]),
 			"h": new Result(6.626070050e-34, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, 1]]),
@@ -45,6 +46,12 @@ export class Constants {
 			"asinh": new NumberFunction(Math.asinh),
 			"atan": new NumberFunction(Math.atan),
 			"atanh": new NumberFunction(Math.atanh),
+			"atan2": new LambdaFunction((args) => {
+				if (args.length != 2) {
+					throw new Error("Invalid number of parameters for atan2() function.");
+				}
+				return new Result(Math.atan2(args[0].toNumber(), args[1].toNumber()));
+			}),
 			"ceil": new NumberFunction(Math.ceil, true),
 			"floor": new NumberFunction(Math.floor, true),
 			"cosh": new NumberFunction(Math.cosh),

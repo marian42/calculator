@@ -9,7 +9,7 @@ export class Unit {
 
 	public preferredNames: NamedUnit[];
 
-	constructor(factor?: number, exponents?: BaseUnitBlock) {
+	constructor(factor?: number, exponents?: BaseUnitBlock, preferredNames?: NamedUnit[]) {
 		if (factor != undefined) {
 			this.factor = factor!;
 		} else {
@@ -20,114 +20,31 @@ export class Unit {
 		} else {
 			this.exponents = exponents;
 		}
-		this.preferredNames = [];
+		if (preferredNames != undefined) {
+			this.preferredNames = preferredNames;
+		} else {
+			this.preferredNames = [];
+		}
 	}
 
 	public multiplyWith(unit: Unit): Unit {
-		return new Unit(this.factor * unit.factor, this.exponents.createSum(unit.exponents));
+		return new Unit(this.factor * unit.factor, this.exponents.createSum(unit.exponents), this.preferredNames.concat(unit.preferredNames));
 	}
 
 	public divideBy(unit: Unit): Unit {
-		return new Unit(this.factor / unit.factor, this.exponents.createSum(unit.exponents.createMultiple(-1)));
+		return new Unit(this.factor / unit.factor, this.exponents.createSum(unit.exponents.createMultiple(-1)), this.preferredNames.concat(unit.preferredNames));
 	}
 
 	public power(exponent: number): Unit {
-		return new Unit(Math.pow(this.factor, exponent), this.exponents.createMultiple(exponent));
+		return new Unit(Math.pow(this.factor, exponent), this.exponents.createMultiple(exponent), this.preferredNames);
 	}
 
-	public toString(): [string, number] {
+	public toString(): string {
 		if (this.exponents.getActiveBaseUnits().length == 0) {
-			return ["", this.factor];
+			return "";
 		} else {
-			return [this.exponents.toString(), this.factor];
+			return this.exponents.toString();
 		}
-
-		/*
-		var currentBlock = this.exponents.createCopy();
-		var names = this.preferredNames.slice();
-
-		var resultComposition: [NamedUnit, number][] = [];
-
-		var c = 20;
-		while (names.length > 0) {
-			var bestFactor = 0;
-			var bestUnit : NamedUnit | null = null;
-			for (var i = 0; i < names.length; i++) {
-				var currentFactor = currentBlock.getBestFactor(names[i].exponents);
-				if (Math.abs(currentFactor) >= 2) {
-					delete names[i];
-					i--;
-				} else if (Math.abs(currentFactor) > Math.abs(bestFactor)) {
-					bestFactor = currentFactor;
-					bestUnit = names[i];
-				}
-			}
-			if (bestUnit == null) {
-				break;
-			}
-			resultComposition.push([bestUnit, bestFactor]);
-			currentBlock = currentBlock.createSum(bestUnit.exponents.createMultiple(-bestFactor));
-			names.splice(names.indexOf(bestUnit));
-
-			c--;
-			if (c == 0) {
-				throw new Error("loop1 failed.");
-			}
-		}
-		while (!currentBlock.isOne()) {
-			console.log("block: " + currentBlock.toString());
-			var bestDistance = currentBlock.getDistance(BaseUnitBlock.one);
-			var bestUnit = NamedUnit.basicUnits[0];
-			for (var namedUnit of NamedUnit.basicUnits) {
-				var distance = currentBlock.getDistance(namedUnit.exponents.createMultiple(currentBlock.getBestFactor(namedUnit.exponents)));
-				if (distance < bestDistance) {
-					bestDistance = distance;
-					bestUnit = namedUnit;
-				}
-			}
-
-
-			var factor = currentBlock.getBestFactor(bestUnit.exponents);
-			console.log("block: " + currentBlock.toString() + ", unit: " + bestUnit.names[0] + ", factor: " + factor);
-			resultComposition.push([bestUnit, factor]);
-			currentBlock = currentBlock.createSum(bestUnit.exponents.createMultiple(-factor));
-			console.log("/ " + bestUnit.names[0] + " ==> " + currentBlock.toString());
-
-			c--;
-			if (c == 0) {
-				throw new Error("loop2 failed.");
-			}
-		}
-
-		resultComposition.sort(tuple => -tuple[1]);
-		var result = "";
-
-		if (resultComposition.length == 0) {
-			return [result, 1];
-		}
-
-		if (resultComposition[0][1] < 0) {
-			result += "1";
-		}
-
-		var currentFactor = this.factor;
-
-		for (var tuple of resultComposition) {
-			if (tuple[1] < 0) {
-				result += "/";
-			}
-			if (tuple[0].prefixExponent != 0) {
-				result += Unit.getPrefixName(tuple[0].prefixExponent);
-			}
-			result += tuple[0].names[0];
-			if (Math.abs(tuple[1]) != 1) {
-				result += TinyNumber.create(Math.abs(tuple[1]));
-			}
-			currentFactor /= Math.pow(Math.pow(10, tuple[0].prefixExponent) * tuple[0].factor, tuple[1]);
-		}
-
-		return [result, currentFactor];
-		*/
 	}
 
 	public static readonly prefixes: [[number, string, string]] = [
@@ -167,7 +84,7 @@ export class Unit {
 			var prefix = value.substr(0, value.indexOf(' ')).trim();
 			var unitName = value.substr(value.indexOf(' ') + 1).trim();
 			var namedUnit = NamedUnit.get(unitName);
-			return new Unit(Math.pow(10, Unit.getPrefix(prefix)) * namedUnit.factor, namedUnit.exponents);
+			return new Unit(Math.pow(10, Unit.getPrefix(prefix)) * namedUnit.factor, namedUnit.exponents, [namedUnit]);
 		}
 		if (Unit.prefixNames == null) {
 			Unit.initializePrefixNames();
@@ -178,7 +95,7 @@ export class Unit {
 				var unitName = value.substr(prefixName.length).trim();
 				if (NamedUnit.exists(unitName)) {
 					var namedUnit = NamedUnit.get(unitName);
-					return new Unit(Math.pow(10, Unit.getPrefix(prefixName)) * namedUnit.factor, namedUnit.exponents);
+					return new Unit(Math.pow(10, Unit.getPrefix(prefixName)) * namedUnit.factor, namedUnit.exponents, [namedUnit]);
 				}
 			}
 		}

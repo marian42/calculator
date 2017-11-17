@@ -33,7 +33,7 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["%", "percent"], 0.01, [[BaseUnit.Percent, 1]]),
 		new NamedUnit(["rad", "radian", "radians"], 1, [[BaseUnit.Radian, 1]]),
 		new NamedUnit(["bit", "b", "bits"], 1, [[BaseUnit.Bit, 1]]),
-		new NamedUnit(["USD", "usd", "$", "dollar", "dollars"], 1, [[BaseUnit.Dollar, 1]]),
+		new NamedUnit(["$", "USD", "usd", "dollar", "dollars"], 1, [[BaseUnit.Dollar, 1]]),
 
 		new NamedUnit(["miles", "mile"], 1609.34, [[BaseUnit.Meter, 1]]),
 		new NamedUnit(["nautical mile", "nautical miles"], 1.852e3, [[BaseUnit.Meter, 1]]),
@@ -65,6 +65,7 @@ export class NamedUnit extends Unit {
 		new NamedUnit(["Wh", "watt hour", "watt hours"], 3600, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["hp", "horse power"], 745.7, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3]]),
 		new NamedUnit(["J", "joule", "joules"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
+		new NamedUnit(["cal", "calorie", "calories"], 4.184, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["eV", "electron volts"], 1.6021766e-19, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -2]]),
 		new NamedUnit(["V", "volt", "volts"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3], [BaseUnit.Ampere, -1]]),
 		new NamedUnit(["C", "coulomb"], 1, [[BaseUnit.Kilogram, 1], [BaseUnit.Meter, 2], [BaseUnit.Second, -3], [BaseUnit.Ampere, -1]]),
@@ -129,12 +130,6 @@ export class NamedUnit extends Unit {
 	}
 
 	public static initializeBasicUnits() {
-		NamedUnit.basicUnits = [];
-		for (var unit of NamedUnit.items) {
-			if (unit.isBasic()) {
-				NamedUnit.basicUnits.push(unit);
-			}
-		}
-		NamedUnit.basicUnits.push(NamedUnit.get("g"));
+		NamedUnit.basicUnits = NamedUnit.items.slice(0, 13);
 	}
 }

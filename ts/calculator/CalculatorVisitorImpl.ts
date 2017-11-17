@@ -8,12 +8,15 @@ import { NamedUnit } from "../calculator/units/NamedUnit";
 import {
 	ExprInvertContext,
 	ExprVariableContext,
-	ExprAddSubContext,
+	ExprSubContext,
+	ExprAddContext,
 	ExprFunctioncallContext,
 	ExprPowerContext,
 	ExprNumberContext,
 	ExprCurrencyContext,
-	ExprMulDivModContext,
+	ExprMulContext,
+	ExprDivContext,
+	ExprModContext,
 	ExprParenthesesContext,
 	StatementExpressionContext,
 	StatementContext,
@@ -30,9 +33,9 @@ import {
 	UnitCubedContext,
 	UnitNameContext,
 	UnitContext,
-	UnitWithPrefixContext,
 	NameContext,
-	FunctionDefinitionContext
+	FunctionDefinitionContext,
+	ConversionContext
  } from '../generated/CalculatorParser';
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
@@ -71,25 +74,27 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		return ctx.text;
 	}
 
-	visitExprAddSub(ctx: ExprAddSubContext) : Result {
+	visitExprAdd(ctx: ExprAddContext) : Result {
 		let left: Result = ctx.expression(0).accept(this);
 		let right: Result = ctx.expression(1).accept(this);
 
 		if (right.unit.exponents.getExponent(BaseUnit.Percent) == 1 && left.unit.exponents.getExponent(BaseUnit.Percent) == 0) {
-			if (ctx.ADD() != undefined) {
-				return new Result(left.value * (1 + right.toNumber()), left.unit);
-			} else if (ctx.SUB() != undefined) {
-				return new Result(left.value * (1 - right.toNumber()), left.unit);
-			} else throw Error("Unknown operand " + ctx._op.text);
+			return new Result(left.value * (1 + right.toNumber()), left.unit);
 		}
 
-		if (ctx.ADD() != undefined) {
-			return new Result(left.value + right.value * right.unit.factor / left.unit.factor, left.unit);
-		} else if (ctx.SUB() != undefined) {
-			return new Result(left.value - right.value * right.unit.factor / left.unit.factor, left.unit);
-		} else throw Error("Unknown operand " + ctx._op.text);
+		return new Result(left.value + right.convertTo(left.unit), left.unit);
 	}
 
+	visitExprSub(ctx: ExprSubContext) : Result {
+		let left: Result = ctx.expression(0).accept(this);
+		let right: Result = ctx.expression(1).accept(this);
+
+		if (right.unit.exponents.getExponent(BaseUnit.Percent) == 1 && left.unit.exponents.getExponent(BaseUnit.Percent) == 0) {
+			return new Result(left.value * (1 - right.toNumber()), left.unit);
+		}
+
+		return new Result(left.value - right.convertTo(left.unit), left.unit);
+	}
 	visitExprFunctioncall(ctx: ExprFunctioncallContext): Result {
 		let functionName = ctx.name().text;
 		let parameters: Result[] = [];
@@ -114,21 +119,29 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitExprCurrency(ctx: ExprCurrencyContext) : Result {
-		var unit =  NamedUnit.get(ctx.CURRENCY().text);
+		var unit = NamedUnit.get(ctx.CURRENCY().text);
 		return new Result(ctx.number().accept(this), unit);
 	}
 
-	visitExprMulDivMod(ctx: ExprMulDivModContext) : Result {
+	visitExprMul(ctx: ExprMulContext) : Result {
 		let left = ctx.expression(0).accept(this);
 		let right = ctx.expression(1).accept(this);
 
-		if (ctx.MUL() != undefined) {
-			return new Result(left.value * right.value, left.unit.multiplyWith(right.unit));
-		} else if (ctx.DIV() != undefined) {
-			return new Result(left.value / right.value, left.unit.divideBy(right.unit));
-		} else if (ctx.MOD() != undefined) {
-			return new Result(left.value % right.value, left.unit.divideBy(right.unit));
-		} else throw Error("Unknown operand " + ctx._op.text);
+		return new Result(left.value * right.value, left.unit.multiplyWith(right.unit));
+	}
+
+	visitExprDiv(ctx: ExprDivContext) : Result {
+		let left = ctx.expression(0).accept(this);
+		let right = ctx.expression(1).accept(this);
+
+		return new Result(left.value / right.value, left.unit.multiplyWith(right.unit));
+	}
+
+	visitExprMod(ctx: ExprMulContext) : Result {
+		let left = ctx.expression(0).accept(this);
+		let right = ctx.expression(1).accept(this);
+
+		return new Result(left.value % right.value, left.unit.multiplyWith(right.unit));
 	}
 
 	visitExprParentheses(ctx: ExprParenthesesContext) : Result {
@@ -166,8 +179,14 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		this.task.exportedFunction = new CustomFunction(names[0], ctx.expression(), this.task, names.slice(1));
 	}
 
+	visitConversion(ctx: ConversionContext): Result {
+		var result = ctx.expression().accept(this);
+		var unit = ctx.unit().accept(this);
+		return new Result(result.convertTo(unit), unit);
+	}
+
 	visitNumber(ctx: NumberContext): number {
-		let text = ctx.NUM()!.text;
+		let text = ctx.text;
 		if (text.startsWith("0b")) {
 			return Number.parseInt(text.substr(2), 2);
 		} else if (text.startsWith("0x")) {
@@ -219,11 +238,14 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 	}
 
 	visitUnitName(ctx: UnitNameContext): Unit {
-		return NamedUnit.get(ctx.getChild(0).text);
-	}
-
-	visitUnitWithPrefix(ctx: UnitWithPrefixContext): Unit {
-		return Unit.parsePrefixedUnit(ctx.PREFIXEDUNIT().text);
+		if (ctx.childCount == 2) {
+			return Unit.parsePrefixedUnit(ctx.text);
+		} else if (ctx.childCount == 1) {
+		    var namedUnit = NamedUnit.get(ctx.getChild(0).text);
+		    return new Unit(namedUnit.factor, namedUnit.exponents.createCopy(), [namedUnit]);
+		} else {
+			throw Error("Invalid number of children: " + ctx.childCount);
+		}
 	}
 
 	visitUnit(ctx: UnitContext): Unit {

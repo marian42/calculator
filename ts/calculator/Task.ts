@@ -8,7 +8,7 @@ import { Constants } from "./Constants";
 import { CustomFunction, CalculatorFunction } from "./CalculatorFunction";
 
 export class Task {
-	public readonly previousTask: Task | null;
+	public previousTask: Task | null;
 
 	public query: string;
 	public result: Result | null;
