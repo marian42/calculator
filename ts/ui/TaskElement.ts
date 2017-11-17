@@ -37,7 +37,6 @@ export class TaskElement {
 		var el = this;
 		this.queryElement.addEventListener("input", () => { el.readQueryAndUpdate(); });
 		this.queryElement.addEventListener("focus", () => { el.onFocus(); });
-		this.queryElement.addEventListener("blur", () => { el.onBlur(); });
 	}
 
 	public showResult() {
@@ -109,7 +108,7 @@ export class TaskElement {
 		}
 	}
 
-	public onBlur() {
+	public onUnselect() {
 		if (this.parseTreeContainer != null) {
 			this.parseTreeContainer.style.display = "none";
 		}

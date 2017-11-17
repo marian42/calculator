@@ -5,6 +5,8 @@ export class App {
 	public taskContainer: HTMLElement;
 	public tasks: TaskElement[];
 
+	public currentTask: TaskElement;
+
 	private url: URL;
 
 	constructor() {
@@ -38,6 +40,7 @@ export class App {
 		let app = this;
 		element.queryElement.addEventListener("keydown", event => app.onKeyPress(event, element));
 		element.queryElement.addEventListener("blur", event => app.onBlur(event, element));
+		element.queryElement.addEventListener("focus", event => app.onFocus(event, element));
 		return element;
 	}
 
@@ -108,5 +111,14 @@ export class App {
 
 	private onBlur(event: Event, taskElement: TaskElement) {
 		this.onFinalize(taskElement);
+	}
+
+	private onFocus(event: Event, taskElement: TaskElement) {
+		if (this.currentTask != null && this.currentTask != taskElement) {
+			this.currentTask.onUnselect();
+		}
+		if (this.currentTask != taskElement) {
+			this.currentTask = taskElement;
+		}
 	}
 }
