@@ -134,7 +134,7 @@ export class CalculatorVisitorImpl implements CalculatorVisitor<any> {
 		let left = ctx.expression(0).accept(this);
 		let right = ctx.expression(1).accept(this);
 
-		return new Result(left.value / right.value, left.unit.multiplyWith(right.unit));
+		return new Result(left.value / right.value, left.unit.divideBy(right.unit));
 	}
 
 	visitExprMod(ctx: ExprMulContext) : Result {
